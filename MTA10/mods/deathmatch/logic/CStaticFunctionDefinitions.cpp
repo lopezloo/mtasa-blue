@@ -1070,7 +1070,7 @@ bool CStaticFunctionDefinitions::SetElementRotation ( CClientEntity& Entity, con
             {
                 Vehicle.SetRotationDegrees ( ConvertEulerRotationOrder(vecRotation, argumentRotOrder, EULER_ZYX ) );            
             }
-			
+            
             break;
         }
         case CCLIENTOBJECT:
@@ -8802,6 +8802,36 @@ bool CStaticFunctionDefinitions::SetLightDirection ( CClientPointLights* pLight,
     {
         pLight->SetDirection ( vecDirection );
         return true;
+    }
+    return false;
+}
+
+CClientRope * CStaticFunctionDefinitions::CreateRope ( CResource & Resource, CClientEntity * pRopeEntity, const CVector & vecPosition, uchar ucSegments, CClientEntity * pRopeHolder )
+{
+    CClientRope * pRope = new CClientRope ( m_pManager, INVALID_ELEMENT_ID, pRopeEntity, vecPosition, ucSegments, pRopeHolder );
+
+    if ( pRope )
+    {
+        pRope->SetParent ( Resource.GetResourceDynamicEntity () );
+    }
+    return pRope;
+}
+
+bool CStaticFunctionDefinitions::AttachElementToRopeAsAttacher ( CClientRope * pRope, CClientEntity * pRopeAttacher )
+{
+    if ( pRope )
+    {
+        pRope->SetAttacherEntity ( pRopeAttacher );
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::DetachElementFromRope ( CClientRope * pRope, CClientEntity * pAttachedElement )
+{
+    if ( pRope )
+    {
+        return pRope->DetachElementFromRope ( pAttachedElement );
     }
     return false;
 }

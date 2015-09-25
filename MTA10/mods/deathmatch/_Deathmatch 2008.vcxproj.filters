@@ -935,6 +935,15 @@
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Browser.cpp">
       <Filter>Source Files\shared_logic\lua</Filter>
     </ClCompile>
+    <ClCompile Include="..\shared_logic\CClientRope.cpp">
+      <Filter>Source Files\shared_logic</Filter>
+    </ClCompile>
+    <ClCompile Include="CLuaFunctionDefs.Rope.cpp">
+      <Filter>Source Files\shared_logic\lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared_logic\CClientRopeManager.cpp">
+      <Filter>Source Files\shared_logic</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CClient.h">
@@ -1650,6 +1659,12 @@
     </ClInclude>
     <ClInclude Include="..\shared_logic\CClientWebBrowser.h">
       <Filter>Header Files\shared_logic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared_logic\CClientRope.h">
+      <Filter>Source Files\shared_logic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared_logic\CClientRopeManager.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -594,6 +594,7 @@
     <ClInclude Include="..\sdk\game\CRemote.h" />
     <ClInclude Include="..\sdk\game\CRenderWare.h" />
     <ClInclude Include="..\sdk\game\CRestart.h" />
+    <ClInclude Include="..\sdk\game\CRope.h" />
     <ClInclude Include="..\sdk\game\CRopes.h" />
     <ClInclude Include="..\sdk\game\CSettings.h" />
     <ClInclude Include="..\sdk\game\CStats.h" />

@@ -309,6 +309,7 @@
     <ClCompile Include="CRenderWareSA.TextureReplacing.cpp" />
     <ClCompile Include="CRenderWareSA.TxdRightSizing.cpp" />
     <ClCompile Include="CRestartSA.cpp" />
+    <ClCompile Include="CRopeSA.cpp" />
     <ClCompile Include="CRopesSA.cpp" />
     <ClCompile Include="CSettingsSA.cpp" />
     <ClCompile Include="CShadowDataSA.cpp" />
@@ -452,6 +453,7 @@
     <ClInclude Include="CRenderWareSA.ShaderMatching.h" />
     <ClInclude Include="CRenderWareSA.ShaderSupport.h" />
     <ClInclude Include="CRestartSA.h" />
+    <ClInclude Include="CRopeSA.h" />
     <ClInclude Include="CRopesSA.h" />
     <ClInclude Include="CSettingsSA.h" />
     <ClInclude Include="CShadowDataSA.h" />

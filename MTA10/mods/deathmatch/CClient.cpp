@@ -97,6 +97,7 @@ int CClient::ClientInitialize ( const char* szArguments, CCoreInterface* pCore )
     // Development mode
     g_pCore->GetCommands ()->Add ( "showcol",                   _("(Development mode) shows the colshapes"),               COMMAND_ShowCollision );
     g_pCore->GetCommands ()->Add ( "showsound",                 _("(Development mode) prints world sound ids into the debug window"),  COMMAND_ShowSound );
+    g_pCore->GetCommands ()->Add ( "ropedebug",                 _("bbb"),  COMMAND_RopeDebug );
 
 #ifdef MTA_DEBUG
     g_pCore->GetCommands ()->Add ( "showsync",          "show sync data",                                   COMMAND_ShowSyncData );

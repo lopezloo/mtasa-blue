@@ -361,6 +361,8 @@
     <ClCompile Include="..\shared_logic\CClientEffectManager.cpp" />
     <ClCompile Include="..\shared_logic\CClientPointLights.cpp" />
     <ClCompile Include="..\shared_logic\CClientPointLightsManager.cpp" />
+    <ClCompile Include="..\shared_logic\CClientRope.cpp" />
+    <ClCompile Include="..\shared_logic\CClientRopeManager.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaVector2Defs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaVector3Defs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaVector4Defs.cpp" />
@@ -376,6 +378,7 @@
     <ClCompile Include="CClient.cpp" />
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="ClientCommands.cpp" />
+    <ClCompile Include="CLuaFunctionDefs.Rope.cpp" />
     <ClCompile Include="CVoiceRecorder.cpp" />
     <ClCompile Include="HeapTrace.cpp" />
     <ClCompile Include="StdInc.cpp">
@@ -755,6 +758,8 @@
     <ClInclude Include="..\shared_logic\CClientEffectManager.h" />
     <ClInclude Include="..\shared_logic\CClientPointLights.h" />
     <ClInclude Include="..\shared_logic\CClientPointLightsManager.h" />
+    <ClInclude Include="..\shared_logic\CClientRope.h" />
+    <ClInclude Include="..\shared_logic\CClientRopeManager.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaVector2Defs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaVector3Defs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaVector4Defs.h" />

@@ -26,6 +26,7 @@ CClientManager::CClientManager ( void )
     m_pPickupStreamer = new CClientStreamer ( CClientPickupManager::IsPickupLimitReached, 100.0f, 300, 300 );
     m_pPlayerStreamer = new CClientStreamer ( CClientPlayerManager::IsPlayerLimitReached, 250.0f, 300, 300 );
     m_pVehicleStreamer = new CClientStreamer ( CClientVehicleManager::IsVehicleLimitReached, 250.0f, 300, 300 );
+    m_pRopeStreamer = new CClientStreamer ( CClientRopeManager::IsRopeLimitReached, 100.0f, 300, 300 );
     m_pModelRequestManager = new CClientModelRequestManager;
 
     m_pGUIManager = new CClientGUIManager;
@@ -55,6 +56,7 @@ CClientManager::CClientManager ( void )
     m_pWeaponManager = new CClientWeaponManager ( this );
     m_pEffectManager = new CClientEffectManager ( this );
     m_pPointLightsManager = new CClientPointLightsManager ( this );
+    m_pRopeManager = new CClientRopeManager ( this );
     m_pPacketRecorder = new CClientPacketRecorder ( this );
 
     m_bBeingDeleted = false;
@@ -163,6 +165,9 @@ CClientManager::~CClientManager ( void )
     delete m_pMarkerStreamer;
     m_pMarkerStreamer = NULL;
 
+    delete m_pRopeStreamer;
+    m_pRopeStreamer = NULL;
+
     delete m_pModelRequestManager;
     m_pModelRequestManager = NULL;
 
@@ -174,6 +179,9 @@ CClientManager::~CClientManager ( void )
 
     delete m_pPointLightsManager;
     m_pPointLightsManager = NULL;
+
+    delete m_pRopeManager;
+    m_pRopeManager = NULL;
 }
 
 //
@@ -211,6 +219,7 @@ void CClientManager::DoPulse ( bool bDoStandardPulses, bool bDoVehicleManagerPul
             m_pColManager->DoPulse ();
             m_pGUIManager->DoPulse ();
             m_pWeaponManager->DoPulse ();
+            m_pRopeManager->DoPulse ();
         }
         else
         {
@@ -245,6 +254,7 @@ void CClientManager::UpdateStreamers ( void )
         m_pPickupStreamer->DoPulse ( vecTemp );
         m_pPlayerStreamer->DoPulse ( vecTemp );
         m_pVehicleStreamer->DoPulse ( vecTemp );
+        m_pRopeStreamer->DoPulse ( vecTemp );
     }
 }
 

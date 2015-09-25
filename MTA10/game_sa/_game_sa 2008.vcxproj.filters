@@ -281,9 +281,6 @@
     <ClCompile Include="CRestartSA.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CRopesSA.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="CSettingsSA.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -402,6 +399,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CRenderWareSA.TxdRightSizing.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CRopeSA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CRopesSA.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -694,9 +697,6 @@
     <ClInclude Include="CRestartSA.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CRopesSA.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="CSettingsSA.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -824,6 +824,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="gamesa_renderware.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CRopeSA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CRopesSA.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -90,4 +90,6 @@ void COMMAND_ShowSyncData           ( const char* szCmdLine );
     void COMMAND_ShowCollision      ( const char* szCmdLine );
     void COMMAND_ShowSound          ( const char* szCmdLine );
 
+    void COMMAND_RopeDebug          ( const char* szCmdLine );
+
 #endif

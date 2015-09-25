@@ -549,7 +549,6 @@ public:
     static bool                         SetAircraftMaxHeight                ( float fHeight );
     static bool                         SetAircraftMaxVelocity              ( float fVelocity );
     static bool                         SetOcclusionsEnabled                ( bool bEnabled );
-    static bool                         CreateSWATRope                      ( CVector vecPosition, DWORD dwDuration );
     static bool                         SetBirdsEnabled                     ( bool bEnabled );
     static bool                         GetBirdsEnabled                     ( void );
     static bool                         SetMoonSize                         ( int iSize );
@@ -704,6 +703,11 @@ public:
     static bool                 GetEntryHandling                    ( CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned int& uiValue );
     static bool                 GetEntryHandling                    ( CHandlingEntry* pEntry, eHandlingProperty eProperty, unsigned char& ucValue );
 
+    // Rope funcs
+    static bool                         CreateSWATRope                      ( CVector vecPosition, DWORD dwDuration );
+    static CClientRope*                 CreateRope                          ( CResource & Resource, CClientEntity * pRopeEntity, const CVector & vecPosition, uchar ucSegmentCount, CClientEntity * pRopeHolder );
+    static bool                            AttachElementToRopeAsAttacher        ( CClientRope * pRope, CClientEntity * pRopeAttacher );
+    static bool                            DetachElementFromRope                ( CClientRope * pRope, CClientEntity * pAttachedElement );
 
     // Version funcs
     static unsigned long                GetVersion                          ( );

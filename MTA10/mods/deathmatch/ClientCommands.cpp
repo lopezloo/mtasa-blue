@@ -1066,3 +1066,22 @@ void COMMAND_ShowSound ( const char* szCmdLine )
     if ( bShow && !g_pClientGame->GetDevelopmentMode () )
         g_pCore->GetConsole ()->Print ( "showsound will have no effect because development mode is off" );
 }
+
+// Vehicle winch debug
+void COMMAND_RopeDebug ( const char* szCmdLine )
+{
+    g_pCore->GetConsole ()->Print ( "RopeDebug" );
+
+    CVehicle * pVehicle = g_pGame->GetPedContext ()->GetVehicle ();
+    g_pCore->GetConsole ()->Printf ( "Ped = %x", g_pGame->GetPedContext ()->GetInterface () );
+    if ( pVehicle )
+    {
+        pVehicle->SetWinchType ( WINCH_BIG_MAGNET );
+        g_pCore->GetConsole ()->Printf ( "Vehicle = %x", pVehicle->GetInterface () );
+    }
+    else
+    {
+        g_pCore->GetConsole ()->Print ( "u are not in vehicle" );
+    }
+    g_pGame->GetRopes ( )->DebugRope ( 0 );
+}
