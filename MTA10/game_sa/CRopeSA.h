@@ -62,9 +62,9 @@ public:
     unsigned char m_bFlags1_8 : 1;
 
     //uint8 m_ucFlags2;
-    unsigned char m_bFlags2_1 : 1;
+    unsigned char m_bFlags2_1 : 1; // 1 for our ropes; 0 for leviathan winch
     unsigned char m_bFlags2_2 : 1;
-    unsigned char m_bFlags2_3 : 1;
+    unsigned char m_bSegmentPhysics : 1; // if 0 segments not collide with ground, vehicles etc.
     unsigned char m_bFlags2_4 : 1;
     unsigned char m_bFlags2_5 : 1;
     unsigned char m_bFlags2_6 : 1;

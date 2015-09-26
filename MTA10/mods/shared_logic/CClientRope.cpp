@@ -28,17 +28,21 @@ CClientRope::CClientRope ( class CClientManager* pManager, ElementID ID, CClient
     m_pRope = NULL;
     m_pRopeAttacherEntity = NULL;
     m_pAttachedEntity = NULL;
-    //m_fMass = -1.0f; // is this settable? maybe it's attached entities (attacher + attached?) mass or something
+    //m_fMass = -1.0f;
 
-    // maybe do it in constructor later
     m_ucSegmentCount = ucSegments;
-    m_fSegmentLength = 2.5f;
+    m_fSegmentLength = 0.66f;
     m_bStreamedIn = true;
 
-    m_vecSegmentsPosition [0] = vecPosition;
-    for ( int i = 1; i < m_ucSegmentCount; i++ )
+    // m_ucSegmentCount + 1 segments become dynamic
+    // Segments between 0 <-> m_ucSegmentCount are static line.
+
+    //m_bFirstCreation = true;
+
+    // Init all segments
+    for ( int i = 0; i < MAX_ROPE_SEGMENTS; i++ )
     {
-        m_vecSegmentsPosition [i] = CVector ( ); // ?
+        m_vecSegmentsPosition [i] = CVector ( vecPosition.fX, vecPosition.fY, vecPosition.fZ - i*m_fSegmentLength );
     }
 
     SetTypeName ( "rope" );
@@ -75,8 +79,11 @@ void CClientRope::Create ( void )
 
             if ( m_pRope )
             {
-                // Apply our data to the rope
-                // bla bla
+                // Update segment positions. Not sure best idea, needs testing
+                for ( int i = 0; i < MAX_ROPE_SEGMENTS; i++ )
+                {
+                    m_pRope->SetSegmentPosition( i, m_vecSegmentsPosition[i] );
+                }
 
                 //UpdateVisibility ();
 
@@ -124,8 +131,7 @@ void CClientRope::Destroy ( void )
 
 void CClientRope::StreamedInPulse ( void )
 {
-    //g_pCore->GetConsole()->Print("CClientRope::StreamedInPulse");
-    // blah blah, maybe update segments here?
+
 }
 
 void CClientRope::NotifyCreate ( void )
@@ -147,8 +153,11 @@ void CClientRope::StreamIn ( bool bInstantly )
 
 void CClientRope::StreamOut ( void )
 {
-    // Maybe save some data
-    // ?
+    // Save segment positions
+    for ( int i = 0; i < MAX_ROPE_SEGMENTS; i++ )
+    {
+        m_vecSegmentsPosition [i] = m_pRope->GetSegmentPosition ( i );
+    }
 
     // Destroy the rope
     Destroy ();
@@ -157,7 +166,7 @@ void CClientRope::StreamOut ( void )
 // Minor stuff \/
 bool CClientRope::SetSegmentPosition ( uchar ucSegment, CVector vecPosition )
 {
-    if ( ucSegment < m_ucSegmentCount || true )
+    if ( ucSegment < MAX_ROPE_SEGMENTS )
     {
         if ( m_pRope )
         {
@@ -178,36 +187,34 @@ bool CClientRope::SetSegmentPosition ( uchar ucSegment, CVector vecPosition )
 
 bool CClientRope::GetSegmentPosition ( uchar ucSegment, CVector & vecPosition )
 {
-    if ( ucSegment < m_ucSegmentCount || true )
+    if ( ucSegment < MAX_ROPE_SEGMENTS )
     {
         if ( m_pRope )
         {
-            vecPosition = m_pRope->GetSegmentPosition ( ucSegment );
+            m_vecSegmentsPosition [ ucSegment ] = m_pRope->GetSegmentPosition ( ucSegment );
         }
-        else
-        {
-            vecPosition = m_vecSegmentsPosition [ ucSegment ];
-        }
+        vecPosition = m_vecSegmentsPosition [ ucSegment ];
+    
         return true;
     }
     return false;
 }
 
-void CClientRope::SetPosition ( const CVector& vecPosition )
+void CClientRope::SetPosition ( const CVector & vecPosition )
 {
     if ( m_pRope )
     {
-        //m_pRope->SetSegmentPosition ( 0, (CVector) vecPosition );
-        m_pRope->Adjust ( vecPosition );
+        m_pRope->SetSegmentPosition ( 0, ( CVector ) vecPosition );
+        //m_pRope->Adjust ( vecPosition );
     }
 
-    m_vecSegmentsPosition [ 0 ] = vecPosition; // ?
+    m_vecSegmentsPosition [ 0 ] = vecPosition;
     UpdateStreamPosition ( vecPosition );
 }
 
 void CClientRope::SetSegmentCount ( uchar ucSegmentCount )
 {
-    if ( ucSegmentCount != 0 && ucSegmentCount < MAX_ROPE_SEGMENTS )
+    if ( ucSegmentCount < MAX_ROPE_SEGMENTS )
     {
         if ( m_pRope )
         {

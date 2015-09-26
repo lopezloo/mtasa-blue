@@ -103,8 +103,8 @@ void CRopesSA::DebugRope ( uchar ucRopeID )
 
     g_pCore->GetConsole()->Printf("pRopeInterface = %x", pRopeInterface);
 
-    //g_pCore->GetConsole()->Printf("m_vecSegments[0] = %f, %f, %f", pRopeInterface->m_vecSegments[0].fX, pRopeInterface->m_vecSegments[0].fY, pRopeInterface->m_vecSegments[0].fZ);
-    //g_pCore->GetConsole()->Printf("m_vecSegmentsReleased[0] = %f, %f, %f", pRopeInterface->m_vecSegmentsReleased[0].fX, pRopeInterface->m_vecSegmentsReleased[0].fY, pRopeInterface->m_vecSegmentsReleased[0].fZ);
+    g_pCore->GetConsole()->Printf("m_vecSegments[0] = %f, %f, %f", pRopeInterface->m_vecSegments[0].fX, pRopeInterface->m_vecSegments[0].fY, pRopeInterface->m_vecSegments[0].fZ);
+    g_pCore->GetConsole()->Printf("m_vecSegmentsReleased[0] = %f, %f, %f", pRopeInterface->m_vecSegmentsReleased[0].fX, pRopeInterface->m_vecSegmentsReleased[0].fY, pRopeInterface->m_vecSegmentsReleased[0].fZ);
 
     g_pCore->GetConsole()->Printf("m_pRopeEntity = %x", pRopeInterface->m_pRopeEntity);
     g_pCore->GetConsole()->Printf("m_pad4 = %f", pRopeInterface->m_fGroundHeight);
@@ -131,7 +131,7 @@ void CRopesSA::DebugRope ( uchar ucRopeID )
 
     g_pCore->GetConsole()->Printf("m_ucFlags2_1 = %x", pRopeInterface->m_bFlags2_1);
     g_pCore->GetConsole()->Printf("m_ucFlags2_2 = %x", pRopeInterface->m_bFlags2_2);
-    g_pCore->GetConsole()->Printf("m_ucFlags2_3 = %x", pRopeInterface->m_bFlags2_3);
+    g_pCore->GetConsole()->Printf("m_ucFlags2_3 = %x", pRopeInterface->m_bSegmentPhysics);
     g_pCore->GetConsole()->Printf("m_ucFlags2_4 = %x", pRopeInterface->m_bFlags2_4);
     g_pCore->GetConsole()->Printf("m_ucFlags2_5 = %x", pRopeInterface->m_bFlags2_5);
     g_pCore->GetConsole()->Printf("m_ucFlags2_6 = %x", pRopeInterface->m_bFlags2_6);
@@ -158,12 +158,12 @@ void CRopesSA::DebugRope ( uchar ucRopeID )
     //CEntitySAInterface * pVehicleInterface = (CEntitySAInterface *)pGame->GetPedContext()->GetVehicle()->GetInterface();
     //g_pCore->GetConsole()->Printf("m_pRopeEntity pVehicleInterface m_pRwObject = %x", pVehicleInterface->m_pRwObject);
 
-    g_pCore->GetConsole()->Print("Rope segments");
+    /*g_pCore->GetConsole()->Print("Rope segments");
     for ( int i = 0; i < 32; i++ )
     {
         g_pCore->GetConsole()->Printf( "m_vecSegments[%d] = %f, %f, %f", i, pRopeInterface->m_vecSegments[i].fX, pRopeInterface->m_vecSegments[i].fY, pRopeInterface->m_vecSegments[i].fZ );
         g_pCore->GetConsole()->Printf( "m_vecSegmentsReleased[%d] = %f, %f, %f", i, pRopeInterface->m_vecSegmentsReleased[i].fX, pRopeInterface->m_vecSegmentsReleased[i].fY, pRopeInterface->m_vecSegmentsReleased[i].fZ );        
-    }
+    }*/
 }
 
 CRope * CRopesSA::CreateRope ( CEntity * pRopeEntity, CVector & vecPosition, uchar ucSegmentCount, CEntity * pRopeHolder )
@@ -172,11 +172,12 @@ CRope * CRopesSA::CreateRope ( CEntity * pRopeEntity, CVector & vecPosition, uch
     DWORD dwFunc = FUNC_CRope_Create;
 
     // Entity which holds rope. Example leviathan. Works partially now - magnet has same Z velocity as this and this is downed up by attached entity (to magnet) mass.
+    // Velocity isn't updating properly (is extremaly high and lags) if holder is object.
+
     // But position isn't updating for some reason.
     // Pos update work if: /createwinch + createRope()
     CEntitySAInterface * pRopeHolderInterface = pRopeHolder->GetInterface();
 
-    // ?
     DWORD dwRopeEntityInterface = (DWORD)pRopeHolder->GetInterface() + 29;
     //DWORD dwRopeEntityInterface = ( DWORD ) pRopeEntity->GetInterface ();
 
@@ -185,16 +186,14 @@ CRope * CRopesSA::CreateRope ( CEntity * pRopeEntity, CVector & vecPosition, uch
     DWORD dwReturn = 0;
 
     char ucRopeType = 1;
-    bool bExpires = false; // make ropes never expiring because currently there no way to detect it; also not sure if it actually work (maybe only in certain types? swat rope?)
-    // Rope is creating with ucSegmentCount + 1 segments?
+    bool bExpires = false;
     
-    // NOT A SEGMENT COUNT. Rope always have 32 segments. It is actually the segment which is start point. Hard to say but best is 0!!
-    // Examples: 2 means segments 2+ will be dynamic, segment 0, 1 and 2 is static
-    // 0 = only 0 is static
-
-
+    // NOT A SEGMENT COUNT. Rope always have 32 segments.
+    // m_ucSegmentCount + 1 segments become dynamic
+    // Segments between 0 <-> m_ucSegmentCount are static line.
     char ucSegmentCountEx = ucSegmentCount;
-    char ucFlags = 4; // 2 ; 0xFD
+
+    char ucFlags = 0;
     int uiExpireTime = 0;
 
     float fX = vecPosition.fX;
@@ -247,14 +246,17 @@ CRope * CRopesSA::CreateRope ( CEntity * pRopeEntity, CVector & vecPosition, uch
     if ( pRopeInterface->m_pRopeAttacherEntity )
     {
         // By default, most rope types create some directly attached object (in 0x556070 CRope::CreateRopeAttacherEntity) (magnet, wrecking ball etc.) so destroy it
-        //pGame->GetWorld ()->Remove ( pRopeInterface->m_pRopeAttacherEntity, CObject_Destructor );
+        pGame->GetWorld ()->Remove ( pRopeInterface->m_pRopeAttacherEntity, CObject_Destructor );
+        // Last (31) segment become static
     }
     
     // Do not expire plx. For some reason default 0 don't work.
     pRopeInterface->m_uiHoldEntityExpireTime = -1;
 
-    pRopeInterface->m_bFlags2_1 = 0;
-    pRopeInterface->m_bFlags2_3 = 1;
+    //pRopeInterface->m_bFlags2_1 = 0;
+
+    // Enable rope segments colliding with ground! Woah!
+    pRopeInterface->m_bSegmentPhysics = true;
 
     for ( int i = 0; i < MAX_ROPES; i++ )
     {
