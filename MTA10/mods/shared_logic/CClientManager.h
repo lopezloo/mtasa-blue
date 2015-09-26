@@ -99,7 +99,7 @@ public:
     inline CClientWeaponManager*        GetWeaponManager            ( void )        { return m_pWeaponManager; }
     inline CClientEffectManager*        GetEffectManager            ( void )        { return m_pEffectManager; }
     inline CClientPointLightsManager*   GetPointLightsManager       ( void )        { return m_pPointLightsManager; }
-    inline CClientRopeManager*            GetRopeManager              ( void )        { return m_pRopeManager; }
+    inline CClientRopeManager*          GetRopeManager              ( void )        { return m_pRopeManager; }
     inline CClientStreamer*             GetRopeStreamer             ( void )        { return m_pRopeStreamer; }
 
     inline bool                         IsGameLoaded                ( void )        { return g_pGame->GetSystemState () == 9 && !m_bGameUnloadedFlag && g_pCore->GetNetwork ()->GetServerBitStreamVersion (); }

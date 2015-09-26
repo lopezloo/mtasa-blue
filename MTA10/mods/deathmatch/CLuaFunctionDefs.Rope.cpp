@@ -12,10 +12,11 @@
 
 int CLuaFunctionDefs::CreateRope ( lua_State * luaVM )
 {
+// bool CreateRope ( )
     CClientEntity*  pRopeEntity;
-    CVector            vecPosition;
-    uchar            ucSegmentCount;
-    CClientEntity*    pRopeHolder;
+    CVector         vecPosition;
+    uchar           ucSegmentCount;
+    CClientEntity*  pRopeHolder;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pRopeEntity );
@@ -56,8 +57,9 @@ int CLuaFunctionDefs::CreateRope ( lua_State * luaVM )
 
 int CLuaFunctionDefs::AttachElementToRopeAsAttacher ( lua_State* luaVM )
 {
+// bool AttachElementToRopeAsAttacher ( element theElement )
     CClientRope*    pRope;
-    CClientEntity*    pRopeAttacher;
+    CClientEntity*  pRopeAttacher;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pRope );
@@ -80,8 +82,9 @@ int CLuaFunctionDefs::AttachElementToRopeAsAttacher ( lua_State* luaVM )
 
 int CLuaFunctionDefs::DetachElementFromRope ( lua_State* luaVM )
 {
+// bool DetachElementFromRope ( element theElement )
     CClientRope*    pRope;
-    CClientEntity*    pAttachedEntity;
+    CClientEntity*  pAttachedEntity;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pRope );
@@ -93,6 +96,61 @@ int CLuaFunctionDefs::DetachElementFromRope ( lua_State* luaVM )
         {
             lua_pushboolean ( luaVM, true );
             return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::SetRopeSegmentPosition ( lua_State* luaVM )
+{
+// bool setRopeSegmentPosition ( rope theRope, int segment, float posX, float posY, float posZ ) 
+    CClientRope*    pRope;
+    uchar           ucSegment;
+    CVector         vecPosition;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pRope );
+    argStream.ReadNumber ( ucSegment );
+    argStream.ReadVector3D ( vecPosition );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( pRope->SetSegmentPosition ( ucSegment, vecPosition ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::GetRopeSegmentPosition ( lua_State* luaVM )
+{
+// float posX, float posY, float posZ getRopeSegmentPosition ( rope theRope, int segment ) 
+    CClientRope*    pRope;
+    uchar           ucSegment;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pRope );
+    argStream.ReadNumber ( ucSegment );
+
+    if ( !argStream.HasErrors () )
+    {
+        CVector vecPosition;
+        if ( pRope->GetSegmentPosition ( ucSegment, vecPosition ) )
+        {
+            lua_pushnumber ( luaVM, vecPosition.fX );
+            lua_pushnumber ( luaVM, vecPosition.fY );
+            lua_pushnumber ( luaVM, vecPosition.fZ );
+            return 3;
         }
     }
     else

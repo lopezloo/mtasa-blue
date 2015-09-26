@@ -1070,8 +1070,14 @@ void COMMAND_ShowSound ( const char* szCmdLine )
 // Vehicle winch debug
 void COMMAND_RopeDebug ( const char* szCmdLine )
 {
-    g_pCore->GetConsole ()->Print ( "RopeDebug" );
+    int iRope = ( szCmdLine && szCmdLine [ 0 ] ) ? atoi ( szCmdLine ) : -1;
+    g_pCore->GetConsole ()->Printf ( "RopeDebug %x", iRope );
 
+    g_pGame->GetRopes ( )->DebugRope ( iRope );
+}
+
+void COMMAND_CreateWinch ( const char* szCmdLine )
+{
     CVehicle * pVehicle = g_pGame->GetPedContext ()->GetVehicle ();
     g_pCore->GetConsole ()->Printf ( "Ped = %x", g_pGame->GetPedContext ()->GetInterface () );
     if ( pVehicle )
@@ -1083,5 +1089,4 @@ void COMMAND_RopeDebug ( const char* szCmdLine )
     {
         g_pCore->GetConsole ()->Print ( "u are not in vehicle" );
     }
-    g_pGame->GetRopes ( )->DebugRope ( 0 );
 }

@@ -22,18 +22,18 @@
 class CRope
 {
 public:
-    virtual void        Remove                        ( void ) = 0;
+    virtual void        Remove                          ( void ) = 0;
 
-    virtual CVector        GetSegmentPosition            ( uchar ucSegment ) = 0;
-    virtual    void        SetSegmentPosition            ( uchar ucSegment, CVector & vecPosition ) = 0;
+    virtual CVector     GetSegmentPosition              ( uchar ucSegment ) = 0;
+    virtual void        SetSegmentPosition              ( uchar ucSegment, CVector & vecPosition ) = 0;
 
-    virtual void        SetSegmentLength            ( float fSegmentLength ) = 0;
-    virtual void        SetSegmentCount                ( uchar ucSegmentCount ) = 0;
+    virtual void        SetSegmentLength                ( float fSegmentLength ) = 0;
+    virtual void        SetSegmentCount                 ( uchar ucSegmentCount ) = 0;
 
-    virtual void        SetAttacherEntity            ( CEntity * pRopeAttacherEntity ) = 0;
-    virtual void        SetAttachedEntity            ( CEntity * pEntityToAttach ) = 0;
+    virtual void        SetAttacherEntity               ( CEntity * pRopeAttacherEntity ) = 0;
+    virtual void        SetAttachedEntity               ( CEntity * pEntityToAttach ) = 0;
 
-    virtual void        Adjust                        ( const CVector & vecPosition ) = 0;
+    virtual void        Adjust                          ( const CVector & vecPosition ) = 0;
 };
 
 #endif

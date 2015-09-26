@@ -155,9 +155,9 @@ void CClientRope::StreamOut ( void )
 }
 
 // Minor stuff \/
-void CClientRope::SetSegmentPosition ( uchar ucSegment, CVector vecPosition )
+bool CClientRope::SetSegmentPosition ( uchar ucSegment, CVector vecPosition )
 {
-    if ( ucSegment < m_ucSegmentCount )
+    if ( ucSegment < m_ucSegmentCount || true )
     {
         if ( m_pRope )
         {
@@ -171,20 +171,26 @@ void CClientRope::SetSegmentPosition ( uchar ucSegment, CVector vecPosition )
             // First segment so update stream position
             UpdateStreamPosition ( vecPosition );
         }
+        return true;
     }
+    return false;
 }
 
-CVector CClientRope::GetSegmentPosition ( uchar ucSegment )
+bool CClientRope::GetSegmentPosition ( uchar ucSegment, CVector & vecPosition )
 {
-    if ( ucSegment < m_ucSegmentCount )
+    if ( ucSegment < m_ucSegmentCount || true )
     {
         if ( m_pRope )
         {
-            return m_pRope->GetSegmentPosition ( ucSegment );
+            vecPosition = m_pRope->GetSegmentPosition ( ucSegment );
         }
-        return m_vecSegmentsPosition [ ucSegment ];
+        else
+        {
+            vecPosition = m_vecSegmentsPosition [ ucSegment ];
+        }
+        return true;
     }
-    return CVector ();
+    return false;
 }
 
 void CClientRope::SetPosition ( const CVector& vecPosition )
@@ -201,7 +207,7 @@ void CClientRope::SetPosition ( const CVector& vecPosition )
 
 void CClientRope::SetSegmentCount ( uchar ucSegmentCount )
 {
-    if ( ucSegmentCount < MAX_ROPE_SEGMENTS )
+    if ( ucSegmentCount != 0 && ucSegmentCount < MAX_ROPE_SEGMENTS )
     {
         if ( m_pRope )
         {

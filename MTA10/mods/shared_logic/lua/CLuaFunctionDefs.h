@@ -1057,8 +1057,8 @@ public:
     LUA_DECLARE ( CreateRope );
     // LUA_DECLARE ( SetRopeSegmentCount );
     // LUA_DECLARE ( GetRopeSegmentCount );
-    // LUA_DECLARE ( SetRopeSegmentPosition );
-    // LUA_DECLARE ( GetRopeSegmentPosition );
+    LUA_DECLARE ( SetRopeSegmentPosition );
+    LUA_DECLARE ( GetRopeSegmentPosition );
     // LUA_DECLARE ( SetRopeSegmentLength );
     // LUA_DECLARE ( GetRopeSegmentLength );
 
@@ -1087,7 +1087,7 @@ private:
     static CClientPickupManager*        m_pPickupManager;
     static CClientDFFManager*           m_pDFFManager;
     static CClientColModelManager*      m_pColModelManager;
-    static CClientRopeManager*            m_pRopeManager;
+    static CClientRopeManager*          m_pRopeManager;
     static CRegisteredCommands*         m_pRegisteredCommands;
 };
 

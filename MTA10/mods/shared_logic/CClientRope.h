@@ -26,61 +26,61 @@ class CClientRope : public CClientStreamElement
     friend class CClientRopeManager;
 
 public:
-                                CClientRope                ( CClientManager * pManager, ElementID ID, CClientEntity * pRopeEntity, CVector vecPosition, uchar ucSegments, CClientEntity * pRopeHolder );
-                                ~CClientRope            ( void );
+                                CClientRope                 ( CClientManager * pManager, ElementID ID, CClientEntity * pRopeEntity, CVector vecPosition, uchar ucSegments, CClientEntity * pRopeHolder );
+                                ~CClientRope                ( void );
 
-    void                        Unlink                  ( void );
+    void                        Unlink                      ( void );
 
-    inline eClientEntityType    GetType                 ( void ) const                      { return CCLIENTROPE; };
-    inline CRope *              GetGameRope                ( void )                            { return m_pRope; }
+    inline eClientEntityType    GetType                     ( void ) const                      { return CCLIENTROPE; };
+    inline CRope *              GetGameRope                 ( void )                            { return m_pRope; }
 
 
-    void                        SetSegmentPosition        ( uchar ucSegment, CVector vecPosition );
-    CVector                        GetSegmentPosition        ( uchar ucSegment );
+    bool                        SetSegmentPosition          ( uchar ucSegment, CVector vecPosition );
+    bool                        GetSegmentPosition          ( uchar ucSegment, CVector & vecPosition );
     
-    inline const CVector&       GetPosition             ( void )                            { return m_vecSegmentsPosition[0]; };
-    inline void                 GetPosition             ( CVector& vecPosition ) const      { vecPosition = m_vecSegmentsPosition[0]; };
-    void                        SetPosition             ( const CVector& vecPosition );
+    inline const CVector&       GetPosition                 ( void )                            { return m_vecSegmentsPosition[0]; };
+    inline void                 GetPosition                 ( CVector& vecPosition ) const      { vecPosition = m_vecSegmentsPosition[0]; };
+    void                        SetPosition                 ( const CVector& vecPosition );
 
-    void                        SetSegmentCount            ( uchar ucSegmentCount );
-    uchar                        GetSegmentCount            ( void );
+    void                        SetSegmentCount             ( uchar ucSegmentCount );
+    uchar                       GetSegmentCount             ( void );
 
-    void                        SetSegmentLength        ( float fSegmentLength );
-    float                        GetSegmentLength        ( void );
+    void                        SetSegmentLength            ( float fSegmentLength );
+    float                       GetSegmentLength            ( void );
 
-    void                        SetAttacherEntity        ( CClientEntity * pRopeAttacherEntity );
-    void                        SetAttachedEntity        ( CClientEntity * pEntityToAttach );    
+    void                        SetAttacherEntity           ( CClientEntity * pRopeAttacherEntity );
+    void                        SetAttachedEntity           ( CClientEntity * pEntityToAttach );    
 
-    bool                        DetachElementFromRope    ( CClientEntity * pAttachedElement );
+    bool                        DetachElementFromRope       ( CClientEntity * pAttachedElement );
 
 protected:
-    void                        StreamIn                ( bool bInstantly );
-    void                        StreamOut               ( void );
+    void                        StreamIn                    ( bool bInstantly );
+    void                        StreamOut                   ( void );
 
-    void                        Create                  ( void );
-    void                        Destroy                 ( void );
+    void                        Create                      ( void );
+    void                        Destroy                     ( void );
 
-    void                        NotifyCreate            ( void );
-    void                        NotifyDestroy           ( void );
+    void                        NotifyCreate                ( void );
+    void                        NotifyDestroy               ( void );
 
-    void                        StreamedInPulse         ( void );
+    void                        StreamedInPulse             ( void );
 
-    class CClientRopeManager*    m_pRopeManager;
-    CVector                        m_vecSegmentsPosition[32];
-    //CVector                        m_vecSegmentsReleased[32];
-    CClientEntity*                m_pRopeAttacherEntity;
-    CClientEntity*                m_pAttachedEntity;
+    class CClientRopeManager*   m_pRopeManager;
+    CVector                     m_vecSegmentsPosition[32];
+  //CVector                     m_vecSegmentsReleased[32];
+    CClientEntity*              m_pRopeAttacherEntity;
+    CClientEntity*              m_pAttachedEntity;
 
-    uchar                        m_ucSegmentCount;
-    float                        m_fSegmentLength;
+    uchar                       m_ucSegmentCount;
+    float                       m_fSegmentLength;
 
-    CClientEntity*                m_pRopeEntity;
-    CClientEntity*                m_pRopeHolder;
+    CClientEntity*              m_pRopeEntity;
+    CClientEntity*              m_pRopeHolder;
 
     bool                        m_bStreamedIn;
 
 public:
-    CRope*                        m_pRope;
+    CRope*                      m_pRope;
 };
 
 #endif

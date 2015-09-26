@@ -8819,7 +8819,7 @@ CClientRope * CStaticFunctionDefinitions::CreateRope ( CResource & Resource, CCl
 
 bool CStaticFunctionDefinitions::AttachElementToRopeAsAttacher ( CClientRope * pRope, CClientEntity * pRopeAttacher )
 {
-    if ( pRope )
+    if ( pRope && pRopeAttacher )
     {
         pRope->SetAttacherEntity ( pRopeAttacher );
         return true;

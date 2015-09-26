@@ -21,11 +21,11 @@
 class CRopes
 {
 public:
-    virtual CRope*        CreateRope                    ( CEntity * pRopeEntity, CVector & vecPosition, uchar ucSegmentCount, CEntity * pRopeHolder ) = 0;
-    virtual int            CreateRopeForSwatPed        ( const CVector & vecPosition, DWORD dwDuration = 4000 ) = 0;
-    virtual void        ProcessAll                    ( void ) = 0;
+    virtual CRope*      CreateRope                      ( CEntity * pRopeEntity, CVector & vecPosition, uchar ucSegmentCount, CEntity * pRopeHolder ) = 0;
+    virtual int         CreateRopeForSwatPed            ( const CVector & vecPosition, DWORD dwDuration = 4000 ) = 0;
+    virtual void        ProcessAll                      ( void ) = 0;
 
-    virtual void        DebugRope                    ( uchar ucRopeID ) = 0;
+    virtual void        DebugRope                       ( uchar ucRopeID ) = 0;
 };
 
 #endif

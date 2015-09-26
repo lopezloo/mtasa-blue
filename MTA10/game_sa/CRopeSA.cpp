@@ -5,7 +5,7 @@
 *  FILE:        game_sa/CRopeSA.cpp
 *  PURPOSE:     Rope entity
 *  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*                JoeBullet <>
+*               JoeBullet <>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -38,6 +38,13 @@ void CRopeSA::Remove ( void )
 {
     g_pCore->GetConsole()->Print("CRopeSA::Remove");
 
+    // Make sure rope still exists (currently, sometimes it disappear)
+    if ( !IsRopeOwnedByCrane() )
+    {
+        g_pCore->GetConsole()->Print("something was fucked up");
+        return;
+    }
+
     // Detach our custom magnet first (if we don't do this magnet will be destroyed)
     SetAttacherEntity ( NULL );
 
@@ -45,7 +52,7 @@ void CRopeSA::Remove ( void )
     DWORD dwThis = ( DWORD ) m_pInterface;
     _asm
     {
-        mov        ecx, dwThis
+        mov     ecx, dwThis
         call    dwFunc
     }
 }
@@ -68,7 +75,6 @@ void CRopeSA::SetAttacherEntity ( CEntity * pRopeAttacherEntity )
             //pRopeAttacherEntityVehicleSA->SetMoveSpeed ( &CVector() );
             return;
         }
-
         
         m_pInterface->m_pRopeAttacherEntity = NULL;
         //m_pInterface->m_ucFlags2 = 0;
@@ -81,7 +87,7 @@ void CRopeSA::SetAttacherEntity ( CEntity * pRopeAttacherEntity )
     // bApplyGravity = 1
     // static = false
 
-    m_pInterface->m_ucFlags2 = 0;
+    //m_pInterface->m_ucFlags2 = 0;
 }
 
 // Attach entity to rope attacher
@@ -115,15 +121,15 @@ void CRopeSA::SetSegmentCount ( uchar ucSegmentCount )
 
 CVector CRopeSA::GetSegmentPosition ( uchar ucSegment )
 {
-    if ( ucSegment < m_pInterface->m_ucSegmentCount )
+    //if ( ucSegment < m_pInterface->m_ucSegmentCount )
         return m_pInterface->m_vecSegments [ ucSegment ];
-    return CVector (); // ?
+    //return CVector (); // ?
 }
 
 // Set segment position
 void CRopeSA::SetSegmentPosition ( uchar ucSegment, CVector & vecPosition )
 {
-    if ( ucSegment < m_pInterface->m_ucSegmentCount )
+    //if ( ucSegment < m_pInterface->m_ucSegmentCount )
         m_pInterface->m_vecSegments [ ucSegment ] = vecPosition;
 }
 
@@ -151,9 +157,12 @@ void CRopeSA::ReleasePickedUpObject ( )
     }
 }
 
-// Adjusts rope position. Can give crash, add some check. Weirdo
+// Adjusts rope start position. Something is wrong here.
+// UpdateWeightInRope
 void CRopeSA::Adjust ( const CVector & vecPosition )
 {
+    g_pCore->GetConsole()->Print("CRopeSA::Adjust");
+
     DWORD dwThis = ( DWORD ) GetInterface ();
     DWORD dwFunc = FUNC_CRope_Adjust;
 
@@ -161,18 +170,48 @@ void CRopeSA::Adjust ( const CVector & vecPosition )
     float fY = vecPosition.fY;
     float fZ = vecPosition.fZ;
 
-    int iUnknown = 1; // maybe segment?
+    float fUnknown = 1.0f;
+    //int iUnknown = 1;
     //CVector pOutVec = CVector(0, 0, 0);
     CVector pOutVec = vecPosition;
+    //CVector * pOutVec = &CVector ();
 
+    // UpdateWeightInRope ( float fX, float fY, float fZ, float fUnknown, CVector * pOutVec ) 
     _asm
     {
-        mov        ecx, dwThis
+        mov     ecx, dwThis
         push    pOutVec
-        push    iUnknown
+        push    fUnknown
         push    fZ
         push    fY
         push    fX
         call    dwFunc
+        //add     esp, 4*5
     }
+
+    // UpdateWeightInRope ( CVector vecPosition, float fUnknown, CVector * pOutVec ) 
+    /*_asm
+    {
+        mov     ecx, dwThis
+        push    pOutVec
+        push    fUnknown
+        push    vecPosition
+        call    dwFunc
+        //add     esp, 4*3
+    }*/
+}
+
+bool CRopeSA::IsRopeOwnedByCrane ( )
+{
+    DWORD dwThis = ( DWORD ) GetInterface ();
+    DWORD dwFunc = FUNC_CRope_IsRopeOwnedByCrane;
+    bool bReturn;
+
+    _asm
+    {
+        mov     ecx, dwThis
+        call    dwFunc
+        mov     bReturn, al;
+    }
+    return bReturn;
 }

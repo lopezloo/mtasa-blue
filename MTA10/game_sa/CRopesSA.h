@@ -26,21 +26,21 @@ class CRopeSA;
 class CRopesSA : public CRopes
 {
 private:
-    CRopeSA*                Ropes [ MAX_ROPES ];
+    CRopeSA*                    Ropes [ MAX_ROPES ];
 
 public:
-                            CRopesSA                    ( void );
-                            ~CRopesSA                    ( void );
+                                CRopesSA                    ( void );
+                                ~CRopesSA                   ( void );
 
-    CRope*                    CreateRope                    ( CEntity * pRopeEntity, CVector & vecPosition, uchar ucSegmentCount, CEntity * pRopeHolder );
-    //CRope*                    FindByRopeEntity            ( CEntity * pRopeEntity );
-    CRope*                    FindByRopeEntity            ( CEntitySAInterface * pRopeEntity );
+    CRope*                      CreateRope                  ( CEntity * pRopeEntity, CVector & vecPosition, uchar ucSegmentCount, CEntity * pRopeHolder );
+  //CRope*                      FindByRopeEntity            ( CEntity * pRopeEntity );
+    CRope*                      FindByRopeEntity            ( CEntitySAInterface * pRopeEntity );
 
-    int                        CreateRopeForSwatPed        ( const CVector & vecPosition, DWORD dwDuration = 4000 );
+    int                         CreateRopeForSwatPed        ( const CVector & vecPosition, DWORD dwDuration = 4000 );
 
-    void                    ProcessAll                    ( void );
+    void                        ProcessAll                  ( void );
 
-    void                    DebugRope                    ( uchar ucRopeID );
+    void                        DebugRope                   ( uchar ucRopeID );
 };
 
 #endif

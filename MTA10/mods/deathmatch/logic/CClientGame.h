@@ -127,7 +127,7 @@ public:
         WATER,
         WEAPON,
         POINTLIGHTS,
-		ROPE,
+        ROPE,
         UNKNOWN,
     };
 
