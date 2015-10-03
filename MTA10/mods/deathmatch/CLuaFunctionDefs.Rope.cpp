@@ -12,17 +12,15 @@
 
 int CLuaFunctionDefs::CreateRope ( lua_State * luaVM )
 {
-// bool CreateRope ( )
-    CClientEntity*  pRopeEntity;
+// bool CreateRope ( float posX, float posY, float posZ [, element holder = nil, int segmentCount = 0 ] )
     CVector         vecPosition;
     uchar           ucSegmentCount;
     CClientEntity*  pRopeHolder;
 
     CScriptArgReader argStream ( luaVM );
-    argStream.ReadUserData ( pRopeEntity );
     argStream.ReadVector3D ( vecPosition );
-    argStream.ReadNumber   ( ucSegmentCount );
     argStream.ReadUserData ( pRopeHolder );
+    argStream.ReadNumber   ( ucSegmentCount, 0 );
 
     if ( !argStream.HasErrors ( ) )
     {
@@ -32,7 +30,7 @@ int CLuaFunctionDefs::CreateRope ( lua_State * luaVM )
             CResource* pResource = pLuaMain->GetResource ();
             if ( pResource )
             {
-                CClientRope* pRope = CStaticFunctionDefinitions::CreateRope ( *pResource, pRopeEntity, vecPosition, ucSegmentCount, pRopeHolder );
+                CClientRope* pRope = CStaticFunctionDefinitions::CreateRope ( *pResource, vecPosition, pRopeHolder, ucSegmentCount );
                 if ( pRope )
                 {
                     CElementGroup * pGroup = pResource->GetElementGroup();
@@ -63,7 +61,7 @@ int CLuaFunctionDefs::AttachElementToRopeAsAttacher ( lua_State* luaVM )
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pRope );
-    argStream.ReadUserData ( pRopeAttacher );
+    argStream.ReadUserData ( pRopeAttacher, NULL );
 
     if ( !argStream.HasErrors () )
     {
@@ -80,19 +78,19 @@ int CLuaFunctionDefs::AttachElementToRopeAsAttacher ( lua_State* luaVM )
     return 1;
 }
 
-int CLuaFunctionDefs::DetachElementFromRope ( lua_State* luaVM )
+int CLuaFunctionDefs::AttachElementToRope ( lua_State* luaVM )
 {
-// bool DetachElementFromRope ( element theElement )
+// bool AttachElementToRope ( element theElement )
     CClientRope*    pRope;
-    CClientEntity*  pAttachedEntity;
+    CClientEntity*  pEntityToAttach;
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadUserData ( pRope );
-    argStream.ReadUserData ( pAttachedEntity );
+    argStream.ReadUserData ( pEntityToAttach, NULL );
 
     if ( !argStream.HasErrors () )
     {
-        if ( CStaticFunctionDefinitions::DetachElementFromRope ( pRope, pAttachedEntity ) )
+        if ( CStaticFunctionDefinitions::AttachElementToRope ( pRope, pEntityToAttach ) )
         {
             lua_pushboolean ( luaVM, true );
             return 1;
@@ -134,7 +132,7 @@ int CLuaFunctionDefs::SetRopeSegmentPosition ( lua_State* luaVM )
 
 int CLuaFunctionDefs::GetRopeSegmentPosition ( lua_State* luaVM )
 {
-// float posX, float posY, float posZ getRopeSegmentPosition ( rope theRope, int segment ) 
+// float, float, float getRopeSegmentPosition ( rope theRope, int segment ) 
     CClientRope*    pRope;
     uchar           ucSegment;
 
@@ -151,6 +149,55 @@ int CLuaFunctionDefs::GetRopeSegmentPosition ( lua_State* luaVM )
             lua_pushnumber ( luaVM, vecPosition.fY );
             lua_pushnumber ( luaVM, vecPosition.fZ );
             return 3;
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::SetRopeSegmentLength ( lua_State* luaVM )
+{
+// bool setRopeSegmentLength ( rope theRope, float length ) 
+    CClientRope*    pRope;
+    float           fLength;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pRope );
+    argStream.ReadNumber ( fLength );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::SetRopeSegmentLength ( pRope, fLength ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogBadType ( luaVM );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::GetRopeSegmentLength ( lua_State* luaVM )
+{
+// float getRopeSegmentLength ( rope theRope ) 
+    CClientRope*    pRope;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pRope );
+
+    if ( !argStream.HasErrors () )
+    {
+        float fLength;
+        if ( CStaticFunctionDefinitions::GetRopeSegmentLength ( pRope, fLength ) )
+        {
+            lua_pushnumber ( luaVM, fLength );
+            return 1;
         }
     }
     else

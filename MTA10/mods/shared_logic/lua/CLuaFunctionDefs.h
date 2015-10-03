@@ -1059,12 +1059,11 @@ public:
     // LUA_DECLARE ( GetRopeSegmentCount );
     LUA_DECLARE ( SetRopeSegmentPosition );
     LUA_DECLARE ( GetRopeSegmentPosition );
-    // LUA_DECLARE ( SetRopeSegmentLength );
-    // LUA_DECLARE ( GetRopeSegmentLength );
+    LUA_DECLARE ( SetRopeSegmentLength );
+    LUA_DECLARE ( GetRopeSegmentLength );
 
     LUA_DECLARE ( AttachElementToRopeAsAttacher );
-    LUA_DECLARE ( DetachElementFromRope );
-    // LUA_DECLARE ( AttachElementToRope );
+    LUA_DECLARE ( AttachElementToRope );
 
 private:
     // Static references to objects

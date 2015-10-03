@@ -19,6 +19,18 @@
 #include <CVector.h>
 #include "Common.h"
 
+enum
+{
+    ROPE_INDUSTRIAL = 1, // leviathan winch
+    ROPE_HARNESS, // little, green goo
+    ROPE_MINIMAGNET, // rc heli magnet
+    ROPE_INDUSTRIAL2,
+    ROPE_WREKINGBALL,
+    ROPE_INDUSTRIAL3, // LV cannon, first segment render always here
+    ROPE_INDUSTRIAL4,
+    ROPE_SWAT,
+};
+
 class CRope
 {
 public:
@@ -30,7 +42,8 @@ public:
     virtual void        SetSegmentLength                ( float fSegmentLength ) = 0;
     virtual void        SetSegmentCount                 ( uchar ucSegmentCount ) = 0;
 
-    virtual void        SetAttacherEntity               ( CEntity * pRopeAttacherEntity ) = 0;
+    virtual void        SetHolderEntity                 ( CEntity * pHolderEntity ) = 0;
+    virtual void        SetAttacherEntity               ( CEntity * pAttacherEntity ) = 0;
     virtual void        SetAttachedEntity               ( CEntity * pEntityToAttach ) = 0;
 
     virtual void        Adjust                          ( const CVector & vecPosition ) = 0;

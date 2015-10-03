@@ -38,8 +38,8 @@ void CRopeSA::Remove ( void )
 {
     g_pCore->GetConsole()->Print("CRopeSA::Remove");
 
-    // Make sure rope still exists (currently, sometimes it disappear)
-    if ( !IsRopeOwnedByCrane() )
+    // Make sure rope still exists (currently, sometimes it disappear). This check don't work for swat ropes (8)
+    if ( !IsRopeOwnedByCrane() && m_pInterface->m_ucRopeType < ROPE_SWAT )
     {
         g_pCore->GetConsole()->Print("something was fucked up");
         return;
@@ -57,37 +57,63 @@ void CRopeSA::Remove ( void )
     }
 }
 
+// Set rope holder
+void CRopeSA::SetHolderEntity ( CEntity * pHolderEntity )
+{
+    GetInterface ()->m_pRopeHolder = ( CEntitySAInterface * ) pHolderEntity;
+    GetInterface ()->m_pRopeEntity = ( CEntitySAInterface * ) pHolderEntity->GetInterface() + 29;
+}
+
 // Make entity directly attached to rope (as magnet)
 void CRopeSA::SetAttacherEntity ( CEntity * pRopeAttacherEntity )
 {
+    // Vehicle replaced with object is still attached to rope but velocity bug seems to be fixed.
     if ( pRopeAttacherEntity == NULL )
     {
-        SetAttachedEntity ( NULL );
         g_pCore->GetConsole()->Print("SetAttacherEntity null");
-        if ( m_pInterface->m_pRopeAttacherEntity->nType == 2 ) // if vehicle
-        {
-            // For some reason replacing vehicle with null cause crash.
-            g_pCore->GetConsole()->Print("SetAttacherEntity: current attacher is vehicle, can't detach");
-            // Currently vehicle is destroyed with rope by GTA
+        if ( !m_pInterface->m_pRopeAttacherEntity )
+            return;
 
-            // Calm down
-            //CVehicleSA * pRopeAttacherEntityVehicleSA = (CVehicleSA *) m_pInterface->m_pRopeAttacherEntity;
-            //pRopeAttacherEntityVehicleSA->SetMoveSpeed ( &CVector() );
+        SetAttachedEntity ( NULL );
+        if ( m_pInterface->m_pRopeAttacherEntity->nType == ENTITY_TYPE_VEHICLE )
+        {
+            // For some reason replacing vehicle with null cause crash. Currently vehicle is destroyed with rope by GTA
+            g_pCore->GetConsole()->Print("SetAttacherEntity: current attacher is vehicle, can't detach");
             return;
         }
         
         m_pInterface->m_pRopeAttacherEntity = NULL;
-        //m_pInterface->m_ucFlags2 = 0;
+        m_pInterface->m_ucRopeType = ROPE_SWAT;
         return;
     }
     CEntitySA * pRopeAttacherEntitySA = dynamic_cast < CEntitySA* > ( pRopeAttacherEntity );
+
+    // Problem: MTA don't know default entity physical data so we can't currently reset it while detach. Simplest way to fix would be recreate.
+    CPhysicalSAInterface * pRopeAttacherPhysicalSAInterface = ( CPhysicalSAInterface * ) pRopeAttacherEntitySA->GetInterface ();
+
+    // Make sure entity is dynamic
+    if ( pRopeAttacherEntitySA->GetInterface ()->nType == ENTITY_TYPE_OBJECT )
+    {
+        pRopeAttacherPhysicalSAInterface->bDisableMovement = false;
+        pRopeAttacherPhysicalSAInterface->bDisableFriction = false;
+        pRopeAttacherPhysicalSAInterface->bApplyGravity = true;
+
+        CPhysicalSA * pEntityToAttachPhysicalSA = dynamic_cast < CPhysicalSA* > ( pRopeAttacherEntity );
+        pEntityToAttachPhysicalSA->AddToMovingList ();
+        pEntityToAttachPhysicalSA->SetStatic ( false );
+        pEntityToAttachPhysicalSA->SetMoveSpeed ( &CVector(0, 0, 0.1) );
+        g_pCore->GetConsole()->Print("CRopeSA::SetAttacherEntity object blah blah");
+    }
+
     m_pInterface->m_pRopeAttacherEntity = pRopeAttacherEntitySA->GetInterface ();
+    m_pInterface->m_ucRopeType = ROPE_INDUSTRIAL;
 
-    // as in CreateRopeAttacherObject
-    // bApplyGravity = 1
-    // static = false
-
-    //m_pInterface->m_ucFlags2 = 0;
+    /*
+        Is this used by ropes? Test me.
+        CEntitySAInterface * m_pAttachedEntity;   // 252
+        CVector m_vecAttachedOffset;    // 256
+        CVector m_vecAttachedRotation;    // 268
+    */
 }
 
 // Attach entity to rope attacher
@@ -97,13 +123,36 @@ void CRopeSA::SetAttacherEntity ( CEntity * pRopeAttacherEntity )
 // But in that case rope will have incorrect mass? (btw. is mass settable?)
 void CRopeSA::SetAttachedEntity ( CEntity * pEntityToAttach )
 {
-#if 0
-    if ( m_pInterface->m_pRopeAttacherEntity ) // 'magnet'
+    if ( m_pInterface->m_pRopeAttacherEntity ) // attacher must exist
     {
+        if ( pEntityToAttach == NULL )
+        {
+            m_pInterface->m_pAttachedEntity = NULL;
+            return;
+        }
+
         CEntitySA * pEntityToAttachSA = dynamic_cast < CEntitySA* > ( pEntityToAttach );
+
+        // Problem: MTA don't know default entity physical data so we can't currently reset it while detach.
+        CPhysicalSAInterface * pEntityToAttachPhysicalSAInterface = ( CPhysicalSAInterface * ) pEntityToAttachSA->GetInterface ();
+        // We need also https://github.com/multitheftauto/mtasa-blue/pull/12 goddamit
+
+        // Make sure entity is dynamic
+        if ( pEntityToAttachSA->GetInterface ()->nType == ENTITY_TYPE_OBJECT )
+        {
+            pEntityToAttachPhysicalSAInterface->bDisableMovement = false;
+            pEntityToAttachPhysicalSAInterface->bDisableFriction = false;
+            pEntityToAttachPhysicalSAInterface->bApplyGravity = true;
+
+            CPhysicalSA * pEntityToAttachPhysicalSA = dynamic_cast < CPhysicalSA* > ( pEntityToAttach );
+            pEntityToAttachPhysicalSA->AddToMovingList ();
+            pEntityToAttachPhysicalSA->SetStatic ( false );
+            pEntityToAttachPhysicalSA->SetMoveSpeed ( &CVector(0, 0, 0.1) );
+            g_pCore->GetConsole()->Print("CRopeSA::SetAttachedEntity object blah blah");
+        }
+
         m_pInterface->m_pAttachedEntity = pEntityToAttachSA->GetInterface ();
     }
-#endif
 }
 
 uchar CRopeSA::GetSegmentCount ( void )
@@ -157,10 +206,11 @@ void CRopeSA::ReleasePickedUpObject ( )
     }
 }
 
-// Adjusts rope start position. Something is wrong here.
+// Adjusts rope start position. Something is wrong here - use SetSegmentPosition instead.
 // UpdateWeightInRope
 void CRopeSA::Adjust ( const CVector & vecPosition )
 {
+#if 0
     g_pCore->GetConsole()->Print("CRopeSA::Adjust");
 
     DWORD dwThis = ( DWORD ) GetInterface ();
@@ -199,6 +249,7 @@ void CRopeSA::Adjust ( const CVector & vecPosition )
         call    dwFunc
         //add     esp, 4*3
     }*/
+#endif
 }
 
 bool CRopeSA::IsRopeOwnedByCrane ( )

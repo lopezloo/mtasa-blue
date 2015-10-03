@@ -8806,9 +8806,9 @@ bool CStaticFunctionDefinitions::SetLightDirection ( CClientPointLights* pLight,
     return false;
 }
 
-CClientRope * CStaticFunctionDefinitions::CreateRope ( CResource & Resource, CClientEntity * pRopeEntity, const CVector & vecPosition, uchar ucSegments, CClientEntity * pRopeHolder )
+CClientRope * CStaticFunctionDefinitions::CreateRope ( CResource & Resource, const CVector & vecPosition, CClientEntity * pRopeHolder, uchar ucSegments )
 {
-    CClientRope * pRope = new CClientRope ( m_pManager, INVALID_ELEMENT_ID, pRopeEntity, vecPosition, ucSegments, pRopeHolder );
+    CClientRope * pRope = new CClientRope ( m_pManager, INVALID_ELEMENT_ID, vecPosition, pRopeHolder, ucSegments );
 
     if ( pRope )
     {
@@ -8819,7 +8819,7 @@ CClientRope * CStaticFunctionDefinitions::CreateRope ( CResource & Resource, CCl
 
 bool CStaticFunctionDefinitions::AttachElementToRopeAsAttacher ( CClientRope * pRope, CClientEntity * pRopeAttacher )
 {
-    if ( pRope && pRopeAttacher )
+    if ( pRope )
     {
         pRope->SetAttacherEntity ( pRopeAttacher );
         return true;
@@ -8827,11 +8827,32 @@ bool CStaticFunctionDefinitions::AttachElementToRopeAsAttacher ( CClientRope * p
     return false;
 }
 
-bool CStaticFunctionDefinitions::DetachElementFromRope ( CClientRope * pRope, CClientEntity * pAttachedElement )
+bool CStaticFunctionDefinitions::AttachElementToRope ( CClientRope * pRope, CClientEntity * pEntityToAttach )
 {
     if ( pRope )
     {
-        return pRope->DetachElementFromRope ( pAttachedElement );
+        pRope->SetAttachedEntity ( pEntityToAttach );
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetRopeSegmentLength ( CClientRope * pRope, float fLength )
+{
+    if ( pRope && fLength > 0 )
+    {
+        pRope->SetSegmentLength ( fLength );
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetRopeSegmentLength ( CClientRope * pRope, float & fLength )
+{
+    if ( pRope )
+    {
+        fLength = pRope->GetSegmentLength ( );
+        return true;
     }
     return false;
 }

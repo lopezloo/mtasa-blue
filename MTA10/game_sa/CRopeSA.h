@@ -64,7 +64,7 @@ public:
     //uint8 m_ucFlags2;
     unsigned char m_bFlags2_1 : 1; // 1 for our ropes; 0 for leviathan winch
     unsigned char m_bFlags2_2 : 1;
-    unsigned char m_bSegmentPhysics : 1; // if 0 segments not collide with ground, vehicles etc.
+    unsigned char m_bSegmentGroundCheck : 1; // if 0 segments not collide with ground, vehicles etc.
     unsigned char m_bFlags2_4 : 1;
     unsigned char m_bFlags2_5 : 1;
     unsigned char m_bFlags2_6 : 1;
@@ -86,6 +86,7 @@ public:
     
     void                    Remove                          ( void );
 
+    void                    SetHolderEntity                 ( CEntity * pHolderEntity );
     void                    SetAttacherEntity               ( CEntity * pRopeAttacherEntity );
     void                    SetAttachedEntity               ( CEntity * pEntityToAttach );
 

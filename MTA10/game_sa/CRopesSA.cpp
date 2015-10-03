@@ -131,7 +131,7 @@ void CRopesSA::DebugRope ( uchar ucRopeID )
 
     g_pCore->GetConsole()->Printf("m_ucFlags2_1 = %x", pRopeInterface->m_bFlags2_1);
     g_pCore->GetConsole()->Printf("m_ucFlags2_2 = %x", pRopeInterface->m_bFlags2_2);
-    g_pCore->GetConsole()->Printf("m_ucFlags2_3 = %x", pRopeInterface->m_bSegmentPhysics);
+    g_pCore->GetConsole()->Printf("m_ucFlags2_3 = %x", pRopeInterface->m_bSegmentGroundCheck);
     g_pCore->GetConsole()->Printf("m_ucFlags2_4 = %x", pRopeInterface->m_bFlags2_4);
     g_pCore->GetConsole()->Printf("m_ucFlags2_5 = %x", pRopeInterface->m_bFlags2_5);
     g_pCore->GetConsole()->Printf("m_ucFlags2_6 = %x", pRopeInterface->m_bFlags2_6);
@@ -166,41 +166,56 @@ void CRopesSA::DebugRope ( uchar ucRopeID )
     }*/
 }
 
-CRope * CRopesSA::CreateRope ( CEntity * pRopeEntity, CVector & vecPosition, uchar ucSegmentCount, CEntity * pRopeHolder )
+CRope * CRopesSA::CreateRope ( CVector & vecPosition, CEntity * pRopeHolder, uchar ucSegmentCount )
 {
     g_pCore->GetConsole()->Printf("CreateRope ucSegmentCount = %x", ucSegmentCount);
     DWORD dwFunc = FUNC_CRope_Create;
+
+    // Find slot.
+    uchar ucFreeSlot = 0;
+    bool bFoundFreeSlot = false;
+    while ( ucFreeSlot < MAX_ROPES && Ropes[ ucFreeSlot ]->GetInterface()->m_ucRopeType != 0 )
+    {
+        ucFreeSlot++;
+    }
+    if ( ucFreeSlot < MAX_ROPES )
+        bFoundFreeSlot = true;
+
+    if ( !bFoundFreeSlot )
+        return ( CRope* ) NULL; // Limit reached
+
+    CRopeSAInterface * pRopeInterface = ( CRopeSAInterface * ) ( ARRAY_CRopes + ucFreeSlot * sizeof(CRopeSAInterface) );
 
     // Entity which holds rope. Example leviathan. Works partially now - magnet has same Z velocity as this and this is downed up by attached entity (to magnet) mass.
     // Velocity isn't updating properly (is extremaly high and lags) if holder is object.
 
     // But position isn't updating for some reason.
-    // Pos update work if: /createwinch + createRope()
+    // Pos update work if leviathan winch was overwritted by our rope (/createwinch + createRope())
+    // 2669
+    // container blue: 2932
+    // INDUS_MAGNET (ROPE_INDUSTRIAL): 3053
+    // MINI_MAGNET (ROPE_MINIMAGNET): 3056
+    // heli_magnet (unused): 1301
+
     CEntitySAInterface * pRopeHolderInterface = pRopeHolder->GetInterface();
-
-    DWORD dwRopeEntityInterface = (DWORD)pRopeHolder->GetInterface() + 29;
-    //DWORD dwRopeEntityInterface = ( DWORD ) pRopeEntity->GetInterface ();
-
+    DWORD dwRopeEntityInterface = ( DWORD ) pRopeHolderInterface + 29;
     CEntitySAInterface * pRopeEntityInterface = ( CEntitySAInterface * ) dwRopeEntityInterface;
 
-    DWORD dwReturn = 0;
-
-    char ucRopeType = 1;
+    bool bReturn = false;
+    // Create rope as SWAT rope so it won't have problems with last segment if there is no magnet attached
+    char ucRopeType = ROPE_SWAT;
     bool bExpires = false;
     
     // NOT A SEGMENT COUNT. Rope always have 32 segments.
     // m_ucSegmentCount + 1 segments become dynamic
     // Segments between 0 <-> m_ucSegmentCount are static line.
-    char ucSegmentCountEx = ucSegmentCount;
+    //char ucSegmentCountEx = ucSegmentCount;
 
     char ucFlags = 0;
     int uiExpireTime = 0;
-
     float fX = vecPosition.fX;
     float fY = vecPosition.fY;
     float fZ = vecPosition.fZ;
-
-    //g_pCore->GetConsole()->Printf("CreateRope ucSegmentCount = %x; dwRopeHolderInterface = %x; dwRopeEntityInterface = %x", ucSegmentCount, dwRopeHolderInterface, dwRopeEntityInterface);
 
     /* Expire settings
     
@@ -223,7 +238,7 @@ CRope * CRopesSA::CreateRope ( CEntity * pRopeEntity, CVector & vecPosition, uch
         push    uiExpireTime
         push    pRopeHolderInterface
         push    ucFlags
-        push    ucSegmentCountEx
+        push    ucSegmentCount
         push    bExpires
         push    fZ
         push    fY
@@ -232,41 +247,30 @@ CRope * CRopesSA::CreateRope ( CEntity * pRopeEntity, CVector & vecPosition, uch
         push    pRopeEntityInterface
         call    dwFunc
         add     esp, 4*10
-        mov     dwReturn, eax
+        mov     bReturn, al
     }
 
-    g_pCore->GetConsole()->Printf("CreateRope returned %x", dwReturn);
+    g_pCore->GetConsole()->Printf( "CreateRope returned %x", bReturn );
 
-    if ( dwReturn == 0 )
+    if ( !bReturn )
         return ( CRope* ) NULL; // Limit reached
 
-    CRopeSAInterface * pRopeInterface = ( CRopeSAInterface * ) FindByRopeEntity ( pRopeEntityInterface );
+    //CRopeSAInterface * pRopeInterface = ( CRopeSAInterface * ) FindByRopeEntity ( pRopeEntityInterface );
     //m_pInterface = ( CRopeSAInterface * ) ( ARRAY_CRopes + iRopeID * sizeof( CRopeSAInterface ) );
 
-    if ( pRopeInterface->m_pRopeAttacherEntity )
+    if ( ucRopeType < ROPE_SWAT && pRopeInterface->m_pRopeAttacherEntity )
     {
         // By default, most rope types create some directly attached object (in 0x556070 CRope::CreateRopeAttacherEntity) (magnet, wrecking ball etc.) so destroy it
         pGame->GetWorld ()->Remove ( pRopeInterface->m_pRopeAttacherEntity, CObject_Destructor );
-        // Last (31) segment become static
+        // Last (31) segment become static in that case.
     }
     
     // Do not expire plx. For some reason default 0 don't work.
     pRopeInterface->m_uiHoldEntityExpireTime = -1;
-
-    //pRopeInterface->m_bFlags2_1 = 0;
-
-    // Enable rope segments colliding with ground! Woah!
-    pRopeInterface->m_bSegmentPhysics = true;
-
-    for ( int i = 0; i < MAX_ROPES; i++ )
-    {
-        if ( Ropes [i]->GetInterface () == pRopeInterface )
-        {
-            DebugRope ( i );
-            return ( CRope * ) Ropes [i];
-        }
-    }
-    return ( CRope* ) NULL;
+    pRopeInterface->m_bSegmentGroundCheck = true;
+   
+    DebugRope ( ucFreeSlot );
+    return ( CRope * ) Ropes [ ucFreeSlot ];
 }
 
 // Returns rope which use specified rope entity

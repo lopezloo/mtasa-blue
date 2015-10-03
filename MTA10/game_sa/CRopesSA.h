@@ -32,7 +32,7 @@ public:
                                 CRopesSA                    ( void );
                                 ~CRopesSA                   ( void );
 
-    CRope*                      CreateRope                  ( CEntity * pRopeEntity, CVector & vecPosition, uchar ucSegmentCount, CEntity * pRopeHolder );
+    CRope*                      CreateRope                  ( CVector & vecPosition, CEntity * pRopeHolder, uchar ucSegmentCount );
   //CRope*                      FindByRopeEntity            ( CEntity * pRopeEntity );
     CRope*                      FindByRopeEntity            ( CEntitySAInterface * pRopeEntity );
 

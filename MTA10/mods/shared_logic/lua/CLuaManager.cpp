@@ -1231,9 +1231,11 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "createSWATRope", CLuaFunctionDefs::CreateSWATRope );
     CLuaCFunctions::AddFunction ( "createRope", CLuaFunctionDefs::CreateRope );
     CLuaCFunctions::AddFunction ( "attachElementToRopeAsAttacher", CLuaFunctionDefs::AttachElementToRopeAsAttacher );
-    CLuaCFunctions::AddFunction ( "detachElementFromRope", CLuaFunctionDefs::DetachElementFromRope );
+    CLuaCFunctions::AddFunction ( "attachElementToRope", CLuaFunctionDefs::AttachElementToRope );
     CLuaCFunctions::AddFunction ( "setRopeSegmentPosition", CLuaFunctionDefs::SetRopeSegmentPosition );
     CLuaCFunctions::AddFunction ( "getRopeSegmentPosition", CLuaFunctionDefs::GetRopeSegmentPosition );
+    CLuaCFunctions::AddFunction ( "setRopeSegmentLength", CLuaFunctionDefs::SetRopeSegmentLength );
+    CLuaCFunctions::AddFunction ( "getRopeSegmentLength", CLuaFunctionDefs::GetRopeSegmentLength );
 
     // Luadef definitions
     CLuaFileDefs::LoadFunctions ();

@@ -21,7 +21,7 @@
 class CRopes
 {
 public:
-    virtual CRope*      CreateRope                      ( CEntity * pRopeEntity, CVector & vecPosition, uchar ucSegmentCount, CEntity * pRopeHolder ) = 0;
+    virtual CRope*      CreateRope                      ( CVector & vecPosition, CEntity * pRopeHolder, uchar ucSegmentCount ) = 0;
     virtual int         CreateRopeForSwatPed            ( const CVector & vecPosition, DWORD dwDuration = 4000 ) = 0;
     virtual void        ProcessAll                      ( void ) = 0;
 

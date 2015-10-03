@@ -705,9 +705,11 @@ public:
 
     // Rope funcs
     static bool                         CreateSWATRope                      ( CVector vecPosition, DWORD dwDuration );
-    static CClientRope*                 CreateRope                          ( CResource & Resource, CClientEntity * pRopeEntity, const CVector & vecPosition, uchar ucSegmentCount, CClientEntity * pRopeHolder );
+    static CClientRope*                 CreateRope                          ( CResource & Resource, const CVector & vecPosition, CClientEntity * pRopeHolder, uchar ucSegmentCount );
     static bool                         AttachElementToRopeAsAttacher       ( CClientRope * pRope, CClientEntity * pRopeAttacher );
-    static bool                         DetachElementFromRope               ( CClientRope * pRope, CClientEntity * pAttachedElement );
+    static bool                         AttachElementToRope                 ( CClientRope * pRope, CClientEntity * pEntityToAttach );
+    static bool                         SetRopeSegmentLength                ( CClientRope * pRope, float fLength );
+    static bool                         GetRopeSegmentLength                ( CClientRope * pRope, float & fLength );
 
     // Version funcs
     static unsigned long                GetVersion                          ( );

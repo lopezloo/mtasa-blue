@@ -48,7 +48,7 @@ void CClientRopeManager::DoPulse ( void )
 
 void CClientRopeManager::DeleteAll ( void )
 {
-    // Delete all the objects
+    // Delete all the ropes
     m_bCanRemoveFromList = false;
     std::vector < CClientRope* > ::const_iterator iter = m_Ropes.begin ();
     for ( ; iter != m_Ropes.end (); iter++ )
@@ -66,7 +66,7 @@ CClientRope* CClientRopeManager::Get ( ElementID ID )
 {
     // Grab the element with the given id. Check its type.
     CClientEntity* pEntity = CElementIDs::GetElement ( ID );
-    if ( pEntity && pEntity->GetType () == CCLIENTOBJECT )
+    if ( pEntity && pEntity->GetType () == CCLIENTROPE )
     {
         return static_cast < CClientRope* > ( pEntity );
     }
