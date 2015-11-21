@@ -1070,7 +1070,7 @@ bool CStaticFunctionDefinitions::SetElementRotation ( CClientEntity& Entity, con
             {
                 Vehicle.SetRotationDegrees ( ConvertEulerRotationOrder(vecRotation, argumentRotOrder, EULER_ZYX ) );            
             }
-			
+            
             break;
         }
         case CCLIENTOBJECT:
@@ -8800,6 +8800,57 @@ bool CStaticFunctionDefinitions::SetLightDirection ( CClientPointLights* pLight,
     if ( pLight )
     {
         pLight->SetDirection ( vecDirection );
+        return true;
+    }
+    return false;
+}
+
+CClientRope * CStaticFunctionDefinitions::CreateRope ( CResource & Resource, const CVector & vecPosition, CClientEntity * pRopeHolder, uchar ucSegments )
+{
+    CClientRope * pRope = new CClientRope ( m_pManager, INVALID_ELEMENT_ID, vecPosition, pRopeHolder, ucSegments );
+
+    if ( pRope )
+    {
+        pRope->SetParent ( Resource.GetResourceDynamicEntity () );
+    }
+    return pRope;
+}
+
+bool CStaticFunctionDefinitions::AttachElementToRopeAsAttacher ( CClientRope * pRope, CClientEntity * pRopeAttacher )
+{
+    if ( pRope )
+    {
+        pRope->SetAttacherEntity ( pRopeAttacher );
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::AttachElementToRope ( CClientRope * pRope, CClientEntity * pEntityToAttach )
+{
+    if ( pRope )
+    {
+        pRope->SetAttachedEntity ( pEntityToAttach );
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetRopeSegmentLength ( CClientRope * pRope, float fLength )
+{
+    if ( pRope && fLength > 0 )
+    {
+        pRope->SetSegmentLength ( fLength );
+        return true;
+    }
+    return false;
+}
+
+bool CStaticFunctionDefinitions::GetRopeSegmentLength ( CClientRope * pRope, float & fLength )
+{
+    if ( pRope )
+    {
+        fLength = pRope->GetSegmentLength ( );
         return true;
     }
     return false;

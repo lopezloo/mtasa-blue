@@ -276,6 +276,7 @@ void CVehicleSA::Init ( void )
     pEntry->Recalculate ();*/
 
     GetVehicleInterface ()->m_nVehicleFlags.bVehicleCanBeTargetted = true;
+    GetVehicleInterface ()->m_nVehicleFlags.bWinchCanPickMeUp = false;
 
     this->internalID = pGame->GetPools ()->GetVehicleRef ( (DWORD *)this->GetVehicleInterface () );
 

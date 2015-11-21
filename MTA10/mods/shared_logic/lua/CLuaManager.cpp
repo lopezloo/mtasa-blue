@@ -1032,7 +1032,6 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setAircraftMaxHeight", CLuaFunctionDefs::SetAircraftMaxHeight );
     CLuaCFunctions::AddFunction ( "setAircraftMaxVelocity", CLuaFunctionDefs::SetAircraftMaxVelocity );
     CLuaCFunctions::AddFunction ( "setOcclusionsEnabled", CLuaFunctionDefs::SetOcclusionsEnabled );
-    CLuaCFunctions::AddFunction ( "createSWATRope", CLuaFunctionDefs::CreateSWATRope );
     CLuaCFunctions::AddFunction ( "setBirdsEnabled", CLuaFunctionDefs::SetBirdsEnabled );
     CLuaCFunctions::AddFunction ( "getBirdsEnabled", CLuaFunctionDefs::GetBirdsEnabled );
     CLuaCFunctions::AddFunction ( "setPedTargetingMarkerEnabled", CLuaFunctionDefs::SetPedTargetingMarkerEnabled );
@@ -1228,6 +1227,16 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "toggleBrowserDevTools", CLuaFunctionDefs::ToggleBrowserDevTools );
     CLuaCFunctions::AddFunction ( "guiCreateBrowser", CLuaFunctionDefs::GUICreateBrowser );
     CLuaCFunctions::AddFunction ( "guiGetBrowser", CLuaFunctionDefs::GUIGetBrowser );
+
+    // Ropes functions
+    CLuaCFunctions::AddFunction ( "createSWATRope", CLuaFunctionDefs::CreateSWATRope );
+    CLuaCFunctions::AddFunction ( "createRope", CLuaFunctionDefs::CreateRope );
+    CLuaCFunctions::AddFunction ( "attachElementToRopeAsAttacher", CLuaFunctionDefs::AttachElementToRopeAsAttacher );
+    CLuaCFunctions::AddFunction ( "attachElementToRope", CLuaFunctionDefs::AttachElementToRope );
+    CLuaCFunctions::AddFunction ( "setRopeSegmentPosition", CLuaFunctionDefs::SetRopeSegmentPosition );
+    CLuaCFunctions::AddFunction ( "getRopeSegmentPosition", CLuaFunctionDefs::GetRopeSegmentPosition );
+    CLuaCFunctions::AddFunction ( "setRopeSegmentLength", CLuaFunctionDefs::SetRopeSegmentLength );
+    CLuaCFunctions::AddFunction ( "getRopeSegmentLength", CLuaFunctionDefs::GetRopeSegmentLength );
 
     // Luadef definitions
     CLuaFileDefs::LoadFunctions ();

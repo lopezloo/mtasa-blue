@@ -38,6 +38,7 @@ CClientMarkerManager*        CLuaFunctionDefs::m_pMarkerManager;
 CClientPickupManager*        CLuaFunctionDefs::m_pPickupManager;
 CClientDFFManager*           CLuaFunctionDefs::m_pDFFManager;
 CClientColModelManager*      CLuaFunctionDefs::m_pColModelManager;
+CClientRopeManager*          CLuaFunctionDefs::m_pRopeManager;
 CRegisteredCommands*         CLuaFunctionDefs::m_pRegisteredCommands;
 
 void CLuaFunctionDefs::Initialize ( CLuaManager* pLuaManager, CScriptDebugging* pScriptDebugging, CClientGame* pClientGame )
