@@ -5,7 +5,7 @@
 *  FILE:        game_sa/CRopeSA.h
 *  PURPOSE:     Header file for rope entity class
 *  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
-*                JoeBullet <>
+*               JoeBullet <>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -17,22 +17,23 @@
 #include <game/CRope.h>
 #include "CEntitySA.h"
 
-#define FUNC_CRope_ResetAll                         0x555DC0
-#define FUNC_CRope_IsEntityAttachedToCrane          0x555F80
+#define FUNC_CRopes_Init                            0x555DC0 // (ResetAll)
+#define FUNC_CRopes_RegisterRope                    0x556B40
+#define FUNC_CRopes_CreateRopeForSwatPed            0x558D10
+#define FUNC_CRopes_FindRope                        0x556000 // (FindByRopeEntity / FindCrane)
+#define FUNC_CRopes_CreateHookObjectForRope         0x556070 // (CreateRopeAttacherObject)
+#define FUNC_CRopes_IsCarriedByRope                 0x555F80 // (IsEntityAttachedToCrane)
+#define FUNC_CRopes_Update                          0x558D70 // (ProcessAll)
+#define FUNC_CRopes_Render                          0x556AE0 // (DrawAll)
+#define FUNC_CRopes_Shutdown                        0x556B10 // (DestroyAll)
+
 #define FUNC_CRope_IsRopeOwnedByCrane               0x555FB0
-#define FUNC_CRope_FindByRopeEntity                 0x556000
 #define FUNC_CRope_ReleasePickedUpObject            0x556030
-#define FUNC_CRope_CreateRopeAttacherObject         0x556070
-#define FUNC_CRope_Destructor                       0x556780
-#define FUNC_CRope_Draw                             0x556800
-#define FUNC_CRope_AttachEntity                     0x5569C0
-#define FUNC_CRope_DrawAll                          0x556AE0
-#define FUNC_CRope_DestroyAll                       0x556B10
-#define FUNC_CRope_Create                           0x556B40
-#define FUNC_CRope_Process                          0x557530
-#define FUNC_CRope_CreateRopeForSwatPed             0x558d10
-#define FUNC_CRope_ProcessAll                       0x558D70
+#define FUNC_CRope_PickUpObject                     0x5569C0 // (AttachEntity)
 #define FUNC_CRope_Adjust                           0x5561B0
+#define FUNC_CRope_Update                           0x557530 // (Process)
+#define FUNC_CRope_Render                           0x556800 // (Draw)
+#define FUNC_CRope_Destructor                       0x556780
 
 class CRopeSAInterface
 {

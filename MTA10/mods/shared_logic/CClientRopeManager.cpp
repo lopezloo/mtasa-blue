@@ -33,7 +33,8 @@ void CClientRopeManager::DoPulse ( void )
 {
     UpdateLimitInfo ();
 
-    g_pGame->GetRopes ()->ProcessAll ();
+    // Force ropes to update
+    g_pGame->GetRopes ()->Update ();
 
     // Loop through all our streamed-in ropes
     for ( uint i = 0 ; i < m_StreamedIn.size () ; i++ )

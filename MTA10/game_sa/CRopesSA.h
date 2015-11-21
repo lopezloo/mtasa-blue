@@ -7,7 +7,7 @@
 *  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
 *               Christian Myhre Lundheim <>
 *               Cecill Etheredge <ijsf@gmx.net>
-*                JoeBullet <>
+*               JoeBullet <>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -19,14 +19,15 @@
 #include <game/CRopes.h>
 #include "CRopeSA.h"
 
-#define ARRAY_CRopes    0xB768B8
+#define ARRAY_CRopes                                0xB768B8
+#define VAR_CRope_Controlled_Crane_Number           0xB76898
 
 class CRopeSA;
 
 class CRopesSA : public CRopes
 {
 private:
-    CRopeSA*                    Ropes [ MAX_ROPES ];
+    CRopeSA*                    Ropes                       [ MAX_ROPES ];
 
 public:
                                 CRopesSA                    ( void );
@@ -38,7 +39,7 @@ public:
 
     int                         CreateRopeForSwatPed        ( const CVector & vecPosition, DWORD dwDuration = 4000 );
 
-    void                        ProcessAll                  ( void );
+    void                        Update                      ( void );
 
     void                        DebugRope                   ( uchar ucRopeID );
 };

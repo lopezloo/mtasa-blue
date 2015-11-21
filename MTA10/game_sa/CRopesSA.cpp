@@ -7,7 +7,7 @@
 *  DEVELOPERS:  Ed Lyons <eai@opencoding.net>
 *               Christian Myhre Lundheim <>
 *               Cecill Etheredge <ijsf@gmx.net>
-*                JoeBullet <>
+*               JoeBullet <>
 *
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
@@ -19,7 +19,7 @@ DWORD dwDurationAddress = 0x558D1El;
 int CRopesSA::CreateRopeForSwatPed ( const CVector & vecPosition, DWORD dwDuration )
 {
     int iReturn;
-    DWORD dwFunc = FUNC_CRope_CreateRopeForSwatPed;
+    DWORD dwFunc = FUNC_CRopes_CreateRopeForSwatPed;
     CVector * pvecPosition = const_cast < CVector * > ( &vecPosition );
     // First Push @ 0x558D1D is the duration.
     MemPut((void*)(dwDurationAddress), dwDuration);
@@ -142,7 +142,7 @@ void CRopesSA::DebugRope ( uchar ucRopeID )
     {
         // Ask somethin
         DWORD dwThis = (DWORD) pRopeInterface->m_pRopeEntity;
-        DWORD dwFunc = FUNC_CRope_IsEntityAttachedToCrane;
+        DWORD dwFunc = FUNC_CRopes_IsCarriedByRope;
         DWORD dwReturn = -1;
         _asm
         {
@@ -169,7 +169,7 @@ void CRopesSA::DebugRope ( uchar ucRopeID )
 CRope * CRopesSA::CreateRope ( CVector & vecPosition, CEntity * pRopeHolder, uchar ucSegmentCount )
 {
     g_pCore->GetConsole()->Printf("CreateRope ucSegmentCount = %x", ucSegmentCount);
-    DWORD dwFunc = FUNC_CRope_Create;
+    DWORD dwFunc = FUNC_CRopes_RegisterRope;
 
     // Find slot.
     uchar ucFreeSlot = 0;
@@ -203,7 +203,8 @@ CRope * CRopesSA::CreateRope ( CVector & vecPosition, CEntity * pRopeHolder, uch
 
     bool bReturn = false;
     // Create rope as SWAT rope so it won't have problems with last segment if there is no magnet attached
-    char ucRopeType = ROPE_SWAT;
+    //char ucRopeType = ROPE_SWAT;
+    char ucRopeType = ROPE_INDUSTRIAL;
     bool bExpires = false;
     
     // NOT A SEGMENT COUNT. Rope always have 32 segments.
@@ -258,12 +259,12 @@ CRope * CRopesSA::CreateRope ( CVector & vecPosition, CEntity * pRopeHolder, uch
     //CRopeSAInterface * pRopeInterface = ( CRopeSAInterface * ) FindByRopeEntity ( pRopeEntityInterface );
     //m_pInterface = ( CRopeSAInterface * ) ( ARRAY_CRopes + iRopeID * sizeof( CRopeSAInterface ) );
 
-    if ( ucRopeType < ROPE_SWAT && pRopeInterface->m_pRopeAttacherEntity )
+    /*if ( ucRopeType < ROPE_SWAT && pRopeInterface->m_pRopeAttacherEntity )
     {
         // By default, most rope types create some directly attached object (in 0x556070 CRope::CreateRopeAttacherEntity) (magnet, wrecking ball etc.) so destroy it
         pGame->GetWorld ()->Remove ( pRopeInterface->m_pRopeAttacherEntity, CObject_Destructor );
         // Last (31) segment become static in that case.
-    }
+    }*/
     
     // Do not expire plx. For some reason default 0 don't work.
     pRopeInterface->m_uiHoldEntityExpireTime = -1;
@@ -278,7 +279,7 @@ CRope * CRopesSA::CreateRope ( CVector & vecPosition, CEntity * pRopeHolder, uch
 CRope * CRopesSA::FindByRopeEntity ( CEntitySAInterface * pRopeEntity )
 {
     //CEntitySA * pRopeEntitySA = dynamic_cast < CEntitySA* > ( pRopeEntity );
-    DWORD dwFunc = FUNC_CRope_FindByRopeEntity;
+    DWORD dwFunc = FUNC_CRopes_FindRope;
     //DWORD dwRopeEntityInterface = ( DWORD ) pRopeEntitySA->GetInterface ();
     DWORD dwRopeEntityInterface = ( DWORD ) pRopeEntity;
     int iReturn = -1;
@@ -295,9 +296,10 @@ CRope * CRopesSA::FindByRopeEntity ( CEntitySAInterface * pRopeEntity )
     return ( CRope * ) ( ARRAY_CRopes + iReturn * sizeof( CRopeSAInterface ) );
 }
 
-void CRopesSA::ProcessAll ( void )
+// Updates all ropes
+void CRopesSA::Update ( void )
 {
-    DWORD dwFunc = FUNC_CRope_ProcessAll;
+    DWORD dwFunc = FUNC_CRopes_Update;
 
     _asm
     {

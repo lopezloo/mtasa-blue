@@ -12,9 +12,10 @@
 *****************************************************************************/
 
 /*
+    v7549
     Try to disable:
-        0x556070 CRope::CreateRopeAttacherEntity - rope will be created without default magnet/wrecking ball
-        0x5569C0 CRope::AttachEntity - propably rope (RopeAttacherEntity) lose magnet ability (other solution: set vehicles bWinchCanPickMeUp to false)
+        0x556070 CRopes::CreateHookObjectForRope - rope will be created without default magnet/wrecking ball
+        0x5569C0 CRope::PickUpObject - propably rope (RopeAttacherEntity) lose magnet ability (other solution: set vehicles bWinchCanPickMeUp to false)
         0x556030 CRope::ReleasePickedUpObject - important - player will not be able to release attached entity on all(?) ropes by pressing <somekeyheremaybectrlbydefault>
 
     Investigate what RopeEntity & RopeHolder is and why it seems to be ignored.

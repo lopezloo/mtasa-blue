@@ -26,7 +26,7 @@ enum
     ROPE_MINIMAGNET, // rc heli magnet
     ROPE_INDUSTRIAL2,
     ROPE_WREKINGBALL,
-    ROPE_INDUSTRIAL3, // LV cannon, first segment render always here
+    ROPE_INDUSTRIAL3, // LV cannon, first segment position is hardcoded?
     ROPE_INDUSTRIAL4,
     ROPE_SWAT,
 };
