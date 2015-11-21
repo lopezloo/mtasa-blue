@@ -1441,6 +1441,9 @@ void CMultiplayerSA::InitHooks()
     // Increase intensity of vehicle tail light corona
     MemPut < BYTE > ( 0x6E1A22, 0xF0 );
 
+    // Disable call to CRope::ReleasePickedUpObject from CRope::Update
+    MemSet ( (void*)0x55824F, 0x90, 5 );
+
 
     InitHooks_CrashFixHacks ();
 
