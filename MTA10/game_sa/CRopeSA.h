@@ -100,7 +100,6 @@ public:
     float                   GetSegmentLength                ( void );
     void                    SetSegmentLength                ( float fLength );
 
-    void                    ReleasePickedUpObject           ( void );
     void                    Adjust                          ( const CVector & vecPosition );
     bool                    IsRopeOwnedByCrane              ( void );
 };

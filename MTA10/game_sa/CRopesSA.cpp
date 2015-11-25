@@ -196,6 +196,8 @@ CRope * CRopesSA::CreateRope ( CVector & vecPosition, CEntity * pRopeHolder, uch
     // INDUS_MAGNET (ROPE_INDUSTRIAL): 3053
     // MINI_MAGNET (ROPE_MINIMAGNET): 3056
     // heli_magnet (unused): 1301
+    // 1393 - cool rope holder
+    // 417 - leviathan
 
     CEntitySAInterface * pRopeHolderInterface = pRopeHolder->GetInterface();
     DWORD dwRopeEntityInterface = ( DWORD ) pRopeHolderInterface + 29;
@@ -203,8 +205,7 @@ CRope * CRopesSA::CreateRope ( CVector & vecPosition, CEntity * pRopeHolder, uch
 
     bool bReturn = false;
     // Create rope as SWAT rope so it won't have problems with last segment if there is no magnet attached
-    //char ucRopeType = ROPE_SWAT;
-    char ucRopeType = ROPE_INDUSTRIAL;
+    char ucRopeType = ROPE_SWAT;
     bool bExpires = false;
     
     // NOT A SEGMENT COUNT. Rope always have 32 segments.

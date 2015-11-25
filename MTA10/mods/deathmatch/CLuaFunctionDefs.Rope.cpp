@@ -19,7 +19,7 @@ int CLuaFunctionDefs::CreateRope ( lua_State * luaVM )
 
     CScriptArgReader argStream ( luaVM );
     argStream.ReadVector3D ( vecPosition );
-    argStream.ReadUserData ( pRopeHolder );
+    argStream.ReadUserData ( pRopeHolder ); // currently can't be nil
     argStream.ReadNumber   ( ucSegmentCount, 0 );
 
     if ( !argStream.HasErrors ( ) )

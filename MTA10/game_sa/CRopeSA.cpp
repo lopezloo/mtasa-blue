@@ -16,15 +16,20 @@
     Try to disable:
         0x556070 CRopes::CreateHookObjectForRope - rope will be created without default magnet/wrecking ball
         0x5569C0 CRope::PickUpObject - propably rope (RopeAttacherEntity) lose magnet ability (other solution: set vehicles bWinchCanPickMeUp to false)
-        0x556030 CRope::ReleasePickedUpObject - important - player will not be able to release attached entity on all(?) ropes by pressing <somekeyheremaybectrlbydefault>
+        0x556030 CRope::ReleasePickedUpObject - important - player will not be able to release attached entity on all(?) ropes by pressing <somekeyheremaybectrlbydefault> [done]
 
     Investigate what RopeEntity & RopeHolder is and why it seems to be ignored.
+
+    * Entities needs to be re-attached after model change.
+    * Crash in CRopeSA::Remove if attacher (vehicle, train) was destroyed before.
 
     Problems:
         1) m_pRopeAttacherEntity (=magnet) lag as fuck. SA bug which occur on all versions, even consoles.
            Magnet will go back instantly to proper position when touch some entity.
            If player press LPM the magnet go down a little for a while (sometimes?)
-           Can be reduced by calling Process(All) manually.
+           Can be reduced by calling CRopes::Update manually.
+
+           Can't reproduce this now. Maybe it occurs only if rope was created initialy as NON-SWAT (with magnet).
         
 */
 
@@ -62,10 +67,10 @@ void CRopeSA::Remove ( void )
 void CRopeSA::SetHolderEntity ( CEntity * pHolderEntity )
 {
     GetInterface ()->m_pRopeHolder = ( CEntitySAInterface * ) pHolderEntity;
-    GetInterface ()->m_pRopeEntity = ( CEntitySAInterface * ) pHolderEntity->GetInterface() + 29;
+    GetInterface ()->m_pRopeEntity = ( CEntitySAInterface * ) pHolderEntity->GetInterface() + 29; // ?
 }
 
-// Make entity directly attached to rope (as magnet)
+// Make entity directly attached to rope (like magnet)
 void CRopeSA::SetAttacherEntity ( CEntity * pRopeAttacherEntity )
 {
     // Vehicle replaced with object is still attached to rope but velocity bug seems to be fixed.
@@ -87,26 +92,24 @@ void CRopeSA::SetAttacherEntity ( CEntity * pRopeAttacherEntity )
         m_pInterface->m_ucRopeType = ROPE_SWAT;
         return;
     }
-    CEntitySA * pRopeAttacherEntitySA = dynamic_cast < CEntitySA* > ( pRopeAttacherEntity );
-
-    // Problem: MTA don't know default entity physical data so we can't currently reset it while detach. Simplest way to fix would be recreate.
-    CPhysicalSAInterface * pRopeAttacherPhysicalSAInterface = ( CPhysicalSAInterface * ) pRopeAttacherEntitySA->GetInterface ();
 
     // Make sure entity is dynamic
-    if ( pRopeAttacherEntitySA->GetInterface ()->nType == ENTITY_TYPE_OBJECT )
+    if ( pRopeAttacherEntity->GetEntityType ( ) == ENTITY_TYPE_OBJECT )
     {
+        // Problem: MTA don't know default entity physical data so we can't currently reset it while detach. Simplest way to fix would be recreate.
+        /*CPhysicalSAInterface * pRopeAttacherPhysicalSAInterface = ( CPhysicalSAInterface * ) pRopeAttacherEntity->GetInterface ();
         pRopeAttacherPhysicalSAInterface->bDisableMovement = false;
         pRopeAttacherPhysicalSAInterface->bDisableFriction = false;
-        pRopeAttacherPhysicalSAInterface->bApplyGravity = true;
+        pRopeAttacherPhysicalSAInterface->bApplyGravity = true;*/
 
-        CPhysicalSA * pEntityToAttachPhysicalSA = dynamic_cast < CPhysicalSA* > ( pRopeAttacherEntity );
-        pEntityToAttachPhysicalSA->AddToMovingList ();
-        pEntityToAttachPhysicalSA->SetStatic ( false );
-        pEntityToAttachPhysicalSA->SetMoveSpeed ( &CVector(0, 0, 0.1) );
+        CPhysicalSA * pRopeAttacherPhysicalSA = dynamic_cast < CPhysicalSA* > ( pRopeAttacherEntity );
+        pRopeAttacherPhysicalSA->AddToMovingList ();
+        pRopeAttacherPhysicalSA->SetStatic ( false );
+        pRopeAttacherPhysicalSA->SetMoveSpeed ( &CVector(0, 0, 0.1) );
         g_pCore->GetConsole()->Print("CRopeSA::SetAttacherEntity object blah blah");
     }
 
-    m_pInterface->m_pRopeAttacherEntity = pRopeAttacherEntitySA->GetInterface ();
+    m_pInterface->m_pRopeAttacherEntity = pRopeAttacherEntity->GetInterface ( );
     m_pInterface->m_ucRopeType = ROPE_INDUSTRIAL;
 
     /*
@@ -117,12 +120,12 @@ void CRopeSA::SetAttacherEntity ( CEntity * pRopeAttacherEntity )
     */
 }
 
-// Attach entity to rope attacher
+// Attach entity to rope attacher (magnet)
 // Can be also via 0x5569C0 CRope::AttachEntity(CEntity *pEntityToAttach)
 //        (but disabling ^ function would be great, because some rope types - or all - have magnet ability)
 // Is this needed? With current attachElements function should be possible attach some element to RopeAttacherEntity. Needs investigate.
 // But in that case rope will have incorrect mass? (btw. is mass settable?)
-void CRopeSA::SetAttachedEntity ( CEntity * pEntityToAttach )
+/*void CRopeSA::SetAttachedEntity ( CEntity * pEntityToAttach )
 {
     if ( m_pInterface->m_pRopeAttacherEntity ) // attacher must exist
     {
@@ -154,6 +157,43 @@ void CRopeSA::SetAttachedEntity ( CEntity * pEntityToAttach )
 
         m_pInterface->m_pAttachedEntity = pEntityToAttachSA->GetInterface ();
     }
+}*/
+
+// Version 2.
+void CRopeSA::SetAttachedEntity ( CEntity * pEntityToAttach )
+{
+    if ( m_pInterface->m_pRopeAttacherEntity )
+    {
+        DWORD dwThis = ( DWORD ) m_pInterface;
+        if ( pEntityToAttach == NULL )
+        {
+            DWORD dwFunc = FUNC_CRope_ReleasePickedUpObject;
+            _asm
+            {
+                mov     ecx, dwThis
+                call    dwFunc
+            }
+        }
+        else
+        {
+            if ( pEntityToAttach->GetEntityType() == ENTITY_TYPE_OBJECT )
+            {
+                pEntityToAttach->SetStatic ( false );
+            }
+
+            DWORD dwEntityToAttachSAInterface = ( DWORD ) pEntityToAttach->GetInterface ();
+            DWORD dwFunc = FUNC_CRope_PickUpObject;
+            _asm
+            {
+                mov     ecx, dwThis
+                push    dwEntityToAttachSAInterface
+                call    dwFunc
+                add     esp, 4
+            }
+        }
+        // Force attacher to update
+        //SetAttacherEntity ( (CEntity *) m_pInterface->m_pRopeAttacherEntity );
+    }
 }
 
 uchar CRopeSA::GetSegmentCount ( void )
@@ -179,8 +219,10 @@ CVector CRopeSA::GetSegmentPosition ( uchar ucSegment )
 // Set segment position
 void CRopeSA::SetSegmentPosition ( uchar ucSegment, CVector & vecPosition )
 {
-    //if ( ucSegment < m_pInterface->m_ucSegmentCount )
+    if ( ucSegment < MAX_ROPE_SEGMENTS )
+    {
         m_pInterface->m_vecSegments [ ucSegment ] = vecPosition;
+    }
 }
 
 // Get/set all segments length
@@ -192,19 +234,6 @@ float CRopeSA::GetSegmentLength ( void )
 void CRopeSA::SetSegmentLength ( float fLength )
 {
     m_pInterface->m_fSegmentLength = fLength;
-}
-
-// (propably) Detach object which is attached to magnet
-void CRopeSA::ReleasePickedUpObject ( )
-{
-    DWORD dwThis = ( DWORD ) GetInterface ();
-    DWORD dwFunc = FUNC_CRope_ReleasePickedUpObject;
-
-    _asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-    }
 }
 
 // Adjusts rope start position. Something is wrong here - use SetSegmentPosition instead.
@@ -263,7 +292,7 @@ bool CRopeSA::IsRopeOwnedByCrane ( )
     {
         mov     ecx, dwThis
         call    dwFunc
-        mov     bReturn, al;
+        mov     bReturn, al
     }
     return bReturn;
 }
