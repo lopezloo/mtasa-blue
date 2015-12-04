@@ -12,7 +12,7 @@
 
 int CLuaFunctionDefs::CreateRope ( lua_State * luaVM )
 {
-// bool CreateRope ( float posX, float posY, float posZ [, element holder = nil, int segmentCount = 0 ] )
+// bool CreateRope ( float posX, float posY, float posZ [, element holder = nil ] )
     CVector         vecPosition;
     uchar           ucSegmentCount;
     CClientEntity*  pRopeHolder;
@@ -20,7 +20,6 @@ int CLuaFunctionDefs::CreateRope ( lua_State * luaVM )
     CScriptArgReader argStream ( luaVM );
     argStream.ReadVector3D ( vecPosition );
     argStream.ReadUserData ( pRopeHolder ); // currently can't be nil
-    argStream.ReadNumber   ( ucSegmentCount, 0 );
 
     if ( !argStream.HasErrors ( ) )
     {
@@ -30,7 +29,7 @@ int CLuaFunctionDefs::CreateRope ( lua_State * luaVM )
             CResource* pResource = pLuaMain->GetResource ();
             if ( pResource )
             {
-                CClientRope* pRope = CStaticFunctionDefinitions::CreateRope ( *pResource, vecPosition, pRopeHolder, ucSegmentCount );
+                CClientRope* pRope = CStaticFunctionDefinitions::CreateRope ( *pResource, vecPosition, pRopeHolder );
                 if ( pRope )
                 {
                     CElementGroup * pGroup = pResource->GetElementGroup();

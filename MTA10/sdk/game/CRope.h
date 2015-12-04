@@ -12,7 +12,8 @@
 #ifndef __CRope_H
 #define __CRope_H
 
-#define MAX_ROPES            8
+//#define MAX_ROPES            8
+#define MAX_ROPES            16
 #define MAX_ROPE_SEGMENTS    32
 
 #include <windows.h>
@@ -46,7 +47,7 @@ public:
     virtual void        SetAttacherEntity               ( CEntity * pAttacherEntity ) = 0;
     virtual void        SetAttachedEntity               ( CEntity * pEntityToAttach ) = 0;
 
-    virtual void        Adjust                          ( const CVector & vecPosition ) = 0;
+    //virtual void        Adjust                          ( const CVector & vecPosition ) = 0;
 };
 
 #endif

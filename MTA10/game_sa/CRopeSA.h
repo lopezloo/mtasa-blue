@@ -17,6 +17,9 @@
 #include <game/CRope.h>
 #include "CEntitySA.h"
 
+#define ARRAY_CRopes                                0xB768B8
+#define VAR_CRope_Controlled_Crane_Number           0xB76898
+
 #define FUNC_CRopes_Init                            0x555DC0 // (ResetAll)
 #define FUNC_CRopes_RegisterRope                    0x556B40
 #define FUNC_CRopes_CreateRopeForSwatPed            0x558D10
@@ -26,6 +29,9 @@
 #define FUNC_CRopes_Update                          0x558D70 // (ProcessAll)
 #define FUNC_CRopes_Render                          0x556AE0 // (DrawAll)
 #define FUNC_CRopes_Shutdown                        0x556B10 // (DestroyAll)
+
+// Used to adjust velocity of created swat rope in CHeli::ProcessControl
+#define FUNC_CRopes_SetSpeedOfTopNode               0x555DF0
 
 #define FUNC_CRope_IsRopeOwnedByCrane               0x555FB0
 #define FUNC_CRope_ReleasePickedUpObject            0x556030
@@ -100,7 +106,8 @@ public:
     float                   GetSegmentLength                ( void );
     void                    SetSegmentLength                ( float fLength );
 
-    void                    Adjust                          ( const CVector & vecPosition );
+    //void                    Adjust                          ( const CVector & vecPosition );
+    //void                    SetSpeedOfTopNode               ( unsigned int uiUnk, const CVector & vecSpeed );
     bool                    IsRopeOwnedByCrane              ( void );
 };
 

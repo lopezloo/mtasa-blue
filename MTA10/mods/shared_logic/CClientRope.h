@@ -26,7 +26,7 @@ class CClientRope : public CClientStreamElement
     friend class CClientRopeManager;
 
 public:
-                                CClientRope                 ( CClientManager * pManager, ElementID ID, CVector vecPosition, CClientEntity * pRopeHolder, uchar ucSegments );
+                                CClientRope                 ( CClientManager * pManager, ElementID ID, CVector vecPosition, CClientEntity * pRopeHolder );
                                 ~CClientRope                ( void );
 
     void                        Unlink                      ( void );
@@ -49,7 +49,7 @@ public:
     float                       GetSegmentLength            ( void );
 
     void                        SetAttacherEntity           ( CClientEntity * pRopeAttacherEntity );
-    void                        SetAttachedEntity           ( CClientEntity * pEntityToAttach );    
+    bool                        SetAttachedEntity           ( CClientEntity * pEntityToAttach );    
     void                        SetHolderEntity             ( CClientEntity * pHolderEntity );
 
     bool                        DetachElementFromRope       ( CClientEntity * pAttachedElement );
@@ -67,14 +67,14 @@ protected:
     void                        StreamedInPulse             ( void );
 
     class CClientRopeManager*   m_pRopeManager;
-    CVector                     m_vecSegmentsPosition[32];
-  //CVector                     m_vecSegmentsReleased[32];
+    CVector                     m_vecSegmentsPosition [ MAX_ROPE_SEGMENTS ];
+  //CVector                     m_vecSegmentsReleased [ MAX_ROPE_SEGMENTS ];
 
     CClientEntity*              m_pHolderEntity;
     CClientEntity*              m_pAttacherEntity;
     CClientEntity*              m_pAttachedEntity;
 
-    uchar                       m_ucSegmentCount;
+  //uchar                       m_ucSegmentCount;
     float                       m_fSegmentLength;
 
 

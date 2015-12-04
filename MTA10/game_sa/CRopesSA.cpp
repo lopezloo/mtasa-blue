@@ -169,7 +169,6 @@ void CRopesSA::DebugRope ( uchar ucRopeID )
 CRope * CRopesSA::CreateRope ( CVector & vecPosition, CEntity * pRopeHolder, uchar ucSegmentCount )
 {
     g_pCore->GetConsole()->Printf("CreateRope ucSegmentCount = %x", ucSegmentCount);
-    DWORD dwFunc = FUNC_CRopes_RegisterRope;
 
     // Find slot.
     uchar ucFreeSlot = 0;
@@ -182,8 +181,9 @@ CRope * CRopesSA::CreateRope ( CVector & vecPosition, CEntity * pRopeHolder, uch
         bFoundFreeSlot = true;
 
     if ( !bFoundFreeSlot )
-        return ( CRope* ) NULL; // Limit reached
+        return NULL; // Limit reached
 
+    DWORD dwFunc = FUNC_CRopes_RegisterRope;
     CRopeSAInterface * pRopeInterface = ( CRopeSAInterface * ) ( ARRAY_CRopes + ucFreeSlot * sizeof(CRopeSAInterface) );
 
     // Entity which holds rope. Example leviathan. Works partially now - magnet has same Z velocity as this and this is downed up by attached entity (to magnet) mass.
@@ -205,7 +205,8 @@ CRope * CRopesSA::CreateRope ( CVector & vecPosition, CEntity * pRopeHolder, uch
 
     bool bReturn = false;
     // Create rope as SWAT rope so it won't have problems with last segment if there is no magnet attached
-    char ucRopeType = ROPE_SWAT;
+  //char ucRopeType = ROPE_SWAT;
+    char ucRopeType = 1;
     bool bExpires = false;
     
     // NOT A SEGMENT COUNT. Rope always have 32 segments.
@@ -213,27 +214,11 @@ CRope * CRopesSA::CreateRope ( CVector & vecPosition, CEntity * pRopeHolder, uch
     // Segments between 0 <-> m_ucSegmentCount are static line.
     //char ucSegmentCountEx = ucSegmentCount;
 
-    char ucFlags = 0;
+    char ucFlags = 1;
     int uiExpireTime = 0;
     float fX = vecPosition.fX;
     float fY = vecPosition.fY;
     float fZ = vecPosition.fZ;
-
-    /* Expire settings
-    
-        Expire after long time
-        bExpries = 1
-        uiExpireTime = 999999
-
-        Expire shortly after creation. Why?
-        bExpries = 0
-        uiExpireTime = 0
-
-        Expire after long time?
-        bExpries = 0
-        uiExpireTime = 0
-        m_uiHoldEntityExpireTime = -1
-    */
 
     _asm
     {
@@ -246,19 +231,16 @@ CRope * CRopesSA::CreateRope ( CVector & vecPosition, CEntity * pRopeHolder, uch
         push    fY
         push    fX
         push    ucRopeType
-        push    pRopeEntityInterface
+      //push    pRopeEntityInterface
+        push    pRopeHolderInterface
         call    dwFunc
         add     esp, 4*10
         mov     bReturn, al
     }
-
-    g_pCore->GetConsole()->Printf( "CreateRope returned %x", bReturn );
+    g_pCore->GetConsole()->Printf( "CreateRope returned %d", bReturn );
 
     if ( !bReturn )
-        return ( CRope* ) NULL; // Limit reached
-
-    //CRopeSAInterface * pRopeInterface = ( CRopeSAInterface * ) FindByRopeEntity ( pRopeEntityInterface );
-    //m_pInterface = ( CRopeSAInterface * ) ( ARRAY_CRopes + iRopeID * sizeof( CRopeSAInterface ) );
+        return NULL; // Limit reached
 
     /*if ( ucRopeType < ROPE_SWAT && pRopeInterface->m_pRopeAttacherEntity )
     {
@@ -270,7 +252,7 @@ CRope * CRopesSA::CreateRope ( CVector & vecPosition, CEntity * pRopeHolder, uch
     // Do not expire plx. For some reason default 0 don't work.
     pRopeInterface->m_uiHoldEntityExpireTime = -1;
     pRopeInterface->m_bSegmentGroundCheck = true;
-   
+
     DebugRope ( ucFreeSlot );
     return ( CRope * ) Ropes [ ucFreeSlot ];
 }
@@ -279,7 +261,7 @@ CRope * CRopesSA::CreateRope ( CVector & vecPosition, CEntity * pRopeHolder, uch
 //CRope * CRopesSA::FindByRopeEntity ( CEntity * pRopeEntity )
 CRope * CRopesSA::FindByRopeEntity ( CEntitySAInterface * pRopeEntity )
 {
-    //CEntitySA * pRopeEntitySA = dynamic_cast < CEntitySA* > ( pRopeEntity );
+    //CEntitySA * pRopeEntitySA = dyfnamic_cast < CEntitySA* > ( pRopeEntity );
     DWORD dwFunc = FUNC_CRopes_FindRope;
     //DWORD dwRopeEntityInterface = ( DWORD ) pRopeEntitySA->GetInterface ();
     DWORD dwRopeEntityInterface = ( DWORD ) pRopeEntity;
@@ -293,7 +275,7 @@ CRope * CRopesSA::FindByRopeEntity ( CEntitySAInterface * pRopeEntity )
         mov     iReturn, eax // id (0 - 7)
     }
     if ( iReturn == -1 )
-        return ( CRope * ) NULL;
+        return NULL;
     return ( CRope * ) ( ARRAY_CRopes + iReturn * sizeof( CRopeSAInterface ) );
 }
 
@@ -301,9 +283,30 @@ CRope * CRopesSA::FindByRopeEntity ( CEntitySAInterface * pRopeEntity )
 void CRopesSA::Update ( void )
 {
     DWORD dwFunc = FUNC_CRopes_Update;
-
     _asm
     {
         call    dwFunc
     }
+}
+
+// Untested. Change uiRope to CRope later
+void CRopesSA::SetSpeedOfTopNode ( unsigned int uiRope, const CVector & vecSpeed )
+{
+    DWORD dwFunc = FUNC_CRopes_SetSpeedOfTopNode;
+    DWORD dwReturn = 0;
+    float fX = vecSpeed.fX;
+    float fY = vecSpeed.fY;
+    float fZ = vecSpeed.fZ;
+    _asm
+    {
+        push    fZ
+        push    fY
+        push    fX
+        push    uiRope
+        call    dwFunc
+        add     esp, 4*4
+        mov     dwReturn, eax
+    }
+
+    g_pCore->GetConsole()->Printf("SetSpeedOfTopNode returned %d", dwReturn);
 }

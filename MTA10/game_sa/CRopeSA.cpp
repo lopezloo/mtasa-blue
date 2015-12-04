@@ -119,47 +119,6 @@ void CRopeSA::SetAttacherEntity ( CEntity * pRopeAttacherEntity )
         CVector m_vecAttachedRotation;    // 268
     */
 }
-
-// Attach entity to rope attacher (magnet)
-// Can be also via 0x5569C0 CRope::AttachEntity(CEntity *pEntityToAttach)
-//        (but disabling ^ function would be great, because some rope types - or all - have magnet ability)
-// Is this needed? With current attachElements function should be possible attach some element to RopeAttacherEntity. Needs investigate.
-// But in that case rope will have incorrect mass? (btw. is mass settable?)
-/*void CRopeSA::SetAttachedEntity ( CEntity * pEntityToAttach )
-{
-    if ( m_pInterface->m_pRopeAttacherEntity ) // attacher must exist
-    {
-        if ( pEntityToAttach == NULL )
-        {
-            m_pInterface->m_pAttachedEntity = NULL;
-            return;
-        }
-
-        CEntitySA * pEntityToAttachSA = dynamic_cast < CEntitySA* > ( pEntityToAttach );
-
-        // Problem: MTA don't know default entity physical data so we can't currently reset it while detach.
-        CPhysicalSAInterface * pEntityToAttachPhysicalSAInterface = ( CPhysicalSAInterface * ) pEntityToAttachSA->GetInterface ();
-        // We need also https://github.com/multitheftauto/mtasa-blue/pull/12 goddamit
-
-        // Make sure entity is dynamic
-        if ( pEntityToAttachSA->GetInterface ()->nType == ENTITY_TYPE_OBJECT )
-        {
-            pEntityToAttachPhysicalSAInterface->bDisableMovement = false;
-            pEntityToAttachPhysicalSAInterface->bDisableFriction = false;
-            pEntityToAttachPhysicalSAInterface->bApplyGravity = true;
-
-            CPhysicalSA * pEntityToAttachPhysicalSA = dynamic_cast < CPhysicalSA* > ( pEntityToAttach );
-            pEntityToAttachPhysicalSA->AddToMovingList ();
-            pEntityToAttachPhysicalSA->SetStatic ( false );
-            pEntityToAttachPhysicalSA->SetMoveSpeed ( &CVector(0, 0, 0.1) );
-            g_pCore->GetConsole()->Print("CRopeSA::SetAttachedEntity object blah blah");
-        }
-
-        m_pInterface->m_pAttachedEntity = pEntityToAttachSA->GetInterface ();
-    }
-}*/
-
-// Version 2.
 void CRopeSA::SetAttachedEntity ( CEntity * pEntityToAttach )
 {
     if ( m_pInterface->m_pRopeAttacherEntity )
@@ -211,9 +170,9 @@ void CRopeSA::SetSegmentCount ( uchar ucSegmentCount )
 
 CVector CRopeSA::GetSegmentPosition ( uchar ucSegment )
 {
-    //if ( ucSegment < m_pInterface->m_ucSegmentCount )
+    if ( ucSegment < m_pInterface->m_ucSegmentCount )
         return m_pInterface->m_vecSegments [ ucSegment ];
-    //return CVector (); // ?
+    return CVector ();
 }
 
 // Set segment position
@@ -234,52 +193,6 @@ float CRopeSA::GetSegmentLength ( void )
 void CRopeSA::SetSegmentLength ( float fLength )
 {
     m_pInterface->m_fSegmentLength = fLength;
-}
-
-// Adjusts rope start position. Something is wrong here - use SetSegmentPosition instead.
-// UpdateWeightInRope
-void CRopeSA::Adjust ( const CVector & vecPosition )
-{
-#if 0
-    g_pCore->GetConsole()->Print("CRopeSA::Adjust");
-
-    DWORD dwThis = ( DWORD ) GetInterface ();
-    DWORD dwFunc = FUNC_CRope_Adjust;
-
-    float fX = vecPosition.fX;
-    float fY = vecPosition.fY;
-    float fZ = vecPosition.fZ;
-
-    float fUnknown = 1.0f;
-    //int iUnknown = 1;
-    //CVector pOutVec = CVector(0, 0, 0);
-    CVector pOutVec = vecPosition;
-    //CVector * pOutVec = &CVector ();
-
-    // UpdateWeightInRope ( float fX, float fY, float fZ, float fUnknown, CVector * pOutVec ) 
-    _asm
-    {
-        mov     ecx, dwThis
-        push    pOutVec
-        push    fUnknown
-        push    fZ
-        push    fY
-        push    fX
-        call    dwFunc
-        //add     esp, 4*5
-    }
-
-    // UpdateWeightInRope ( CVector vecPosition, float fUnknown, CVector * pOutVec ) 
-    /*_asm
-    {
-        mov     ecx, dwThis
-        push    pOutVec
-        push    fUnknown
-        push    vecPosition
-        call    dwFunc
-        //add     esp, 4*3
-    }*/
-#endif
 }
 
 bool CRopeSA::IsRopeOwnedByCrane ( )

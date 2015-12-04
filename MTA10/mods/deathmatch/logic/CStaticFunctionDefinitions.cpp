@@ -8805,9 +8805,9 @@ bool CStaticFunctionDefinitions::SetLightDirection ( CClientPointLights* pLight,
     return false;
 }
 
-CClientRope * CStaticFunctionDefinitions::CreateRope ( CResource & Resource, const CVector & vecPosition, CClientEntity * pRopeHolder, uchar ucSegments )
+CClientRope * CStaticFunctionDefinitions::CreateRope ( CResource & Resource, const CVector & vecPosition, CClientEntity * pRopeHolder )
 {
-    CClientRope * pRope = new CClientRope ( m_pManager, INVALID_ELEMENT_ID, vecPosition, pRopeHolder, ucSegments );
+    CClientRope * pRope = new CClientRope ( m_pManager, INVALID_ELEMENT_ID, vecPosition, pRopeHolder );
 
     if ( pRope )
     {
@@ -8830,8 +8830,7 @@ bool CStaticFunctionDefinitions::AttachElementToRope ( CClientRope * pRope, CCli
 {
     if ( pRope )
     {
-        pRope->SetAttachedEntity ( pEntityToAttach );
-        return true;
+        return pRope->SetAttachedEntity ( pEntityToAttach );
     }
     return false;
 }

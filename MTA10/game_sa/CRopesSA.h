@@ -19,9 +19,6 @@
 #include <game/CRopes.h>
 #include "CRopeSA.h"
 
-#define ARRAY_CRopes                                0xB768B8
-#define VAR_CRope_Controlled_Crane_Number           0xB76898
-
 class CRopeSA;
 
 class CRopesSA : public CRopes
@@ -40,6 +37,7 @@ public:
     int                         CreateRopeForSwatPed        ( const CVector & vecPosition, DWORD dwDuration = 4000 );
 
     void                        Update                      ( void );
+    void                        SetSpeedOfTopNode           ( unsigned int uiRope, const CVector & vecSpeed );
 
     void                        DebugRope                   ( uchar ucRopeID );
 };

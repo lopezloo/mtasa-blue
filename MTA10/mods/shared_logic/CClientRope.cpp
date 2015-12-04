@@ -15,7 +15,7 @@
 //CClientRope::CClientRope ( CClientManager * pManager, ElementID ID, CClientEntity * pRopeEntity, CVector vecPosition, uchar ucSegments, CClientEntity * pRopeHolder ) : ClassInit ( this ), CClientStreamElement ( pManager->GetRopeStreamer (), ID )
 //CClientRope::CClientRope ( class CClientManager* pManager, ElementID ID, CClientEntity * pRopeEntity, CVector vecPosition, uchar ucSegments, CClientEntity * pRopeHolder ) : ClassInit ( this ), CClientEntity ( ID )
 
-CClientRope::CClientRope ( class CClientManager* pManager, ElementID ID, CVector vecPosition, CClientEntity * pRopeHolder, uchar ucSegments )
+CClientRope::CClientRope ( class CClientManager* pManager, ElementID ID, CVector vecPosition, CClientEntity * pRopeHolder )
     : ClassInit ( this )
     , CClientStreamElement ( pManager->GetRopeStreamer (), ID )
 {
@@ -28,7 +28,6 @@ CClientRope::CClientRope ( class CClientManager* pManager, ElementID ID, CVector
     m_pAttacherEntity = NULL;
     m_pAttachedEntity = NULL;
   //m_fMass = 20.0f;
-    m_ucSegmentCount = ucSegments;
     m_fSegmentLength = 0.2f;
   //m_bSegmentGroundCheck = true;
 
@@ -71,7 +70,7 @@ void CClientRope::Create ( void )
         if ( !CClientRopeManager::IsRopeLimitReached () )
         {
             // Create the rope
-            m_pRope = g_pGame->GetRopes ()->CreateRope ( m_vecSegmentsPosition[0], m_pHolderEntity->GetGameEntity (), m_ucSegmentCount );
+            m_pRope = g_pGame->GetRopes ()->CreateRope ( m_vecSegmentsPosition[0], m_pHolderEntity->GetGameEntity (), 0 );
 
             if ( m_pRope )
             {
@@ -81,14 +80,16 @@ void CClientRope::Create ( void )
                     m_pRope->SetSegmentPosition ( i, m_vecSegmentsPosition[i] );
                 }
                 m_pRope->SetSegmentLength ( m_fSegmentLength );
+
                 if ( m_pAttacherEntity )
                 {
                     m_pRope->SetAttacherEntity ( m_pAttacherEntity->GetGameEntity () );
                 }
-                /*if ( m_pAttachedEntity )
+
+                if ( m_pAttachedEntity )
                 {
                     m_pRope->SetAttachedEntity ( m_pAttachedEntity->GetGameEntity () );
-                }*/
+                }
 
                 //UpdateVisibility ();
 
@@ -136,9 +137,7 @@ void CClientRope::Destroy ( void )
 
 void CClientRope::StreamedInPulse ( void )
 {
-    //m_pRope->Process ();
-    
-    //if ( m_pAttacherEntity )
+    //m_pRope->Update ();
 }
 
 void CClientRope::NotifyCreate ( void )
@@ -167,7 +166,7 @@ void CClientRope::StreamOut ( void )
     }
 
     // Destroy the rope
-    Destroy ();
+    Destroy ( );
 }
 
 // Minor stuff \/
@@ -201,7 +200,6 @@ bool CClientRope::GetSegmentPosition ( uchar ucSegment, CVector & vecPosition )
             m_vecSegmentsPosition [ ucSegment ] = m_pRope->GetSegmentPosition ( ucSegment );
         }
         vecPosition = m_vecSegmentsPosition [ ucSegment ];
-    
         return true;
     }
     return false;
@@ -212,29 +210,10 @@ void CClientRope::SetPosition ( const CVector & vecPosition )
     if ( m_pRope )
     {
         m_pRope->SetSegmentPosition ( 0, ( CVector ) vecPosition );
-        //m_pRope->Adjust ( vecPosition );
     }
 
     m_vecSegmentsPosition [ 0 ] = vecPosition;
     UpdateStreamPosition ( vecPosition );
-}
-
-void CClientRope::SetSegmentCount ( uchar ucSegmentCount )
-{
-    if ( ucSegmentCount < MAX_ROPE_SEGMENTS )
-    {
-        if ( m_pRope )
-        {
-            m_pRope->SetSegmentCount ( ucSegmentCount );
-        }
-
-        m_ucSegmentCount = ucSegmentCount;
-    }
-}
-
-uchar CClientRope::GetSegmentCount ( void )
-{
-    return m_ucSegmentCount;
 }
 
 void CClientRope::SetSegmentLength ( float fSegmentLength )
@@ -262,12 +241,7 @@ void CClientRope::SetAttacherEntity ( CClientEntity * pAttacherEntity )
     m_pAttacherEntity = pAttacherEntity;
     if ( m_pRope )
     {
-        if ( pAttacherEntity == NULL )
-        {
-            m_pRope->SetAttacherEntity ( NULL );
-            return;
-        }
-        m_pRope->SetAttacherEntity ( pAttacherEntity->GetGameEntity () );
+        m_pRope->SetAttacherEntity ( pAttacherEntity ? pAttacherEntity->GetGameEntity () : NULL );
     }
 
     // Disable object break ability. This cause only weird effect so user can re-enable it later.
@@ -279,18 +253,17 @@ void CClientRope::SetAttacherEntity ( CClientEntity * pAttacherEntity )
 
 }
 
-void CClientRope::SetAttachedEntity ( CClientEntity * pEntityToAttach )
+bool CClientRope::SetAttachedEntity ( CClientEntity * pEntityToAttach )
 {
+    if ( m_pAttacherEntity == NULL )
+        return false;
+
     m_pAttachedEntity = pEntityToAttach;
     if ( m_pRope )
     {
-        if ( pEntityToAttach == NULL )
-        {
-            m_pRope->SetAttachedEntity ( NULL );
-            return;
-        }
-        m_pRope->SetAttachedEntity ( pEntityToAttach->GetGameEntity () );
+        m_pRope->SetAttachedEntity ( pEntityToAttach ? pEntityToAttach->GetGameEntity () : NULL );
     }
+    return true;
 }
 
 void CClientRope::SetHolderEntity ( CClientEntity * pHolderEntity )
