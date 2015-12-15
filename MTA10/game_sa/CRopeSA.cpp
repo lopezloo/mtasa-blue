@@ -12,7 +12,7 @@
 *****************************************************************************/
 
 /*
-    v7549
+    v7569
     Try to disable:
         0x556070 CRopes::CreateHookObjectForRope - rope will be created without default magnet/wrecking ball
         0x5569C0 CRope::PickUpObject - propably rope (RopeAttacherEntity) lose magnet ability (other solution: set vehicles bWinchCanPickMeUp to false)
@@ -22,6 +22,7 @@
 
     * Entities needs to be re-attached after model change.
     * Crash in CRopeSA::Remove if attacher (vehicle, train) was destroyed before.
+    * Crash when holder is localplayer and re-spawn.
 
     Problems:
         1) m_pRopeAttacherEntity (=magnet) lag as fuck. SA bug which occur on all versions, even consoles.
@@ -44,10 +45,9 @@ void CRopeSA::Remove ( void )
 {
     g_pCore->GetConsole()->Print("CRopeSA::Remove");
 
-    // Make sure rope still exists (currently, sometimes it disappear). This check don't work for swat ropes (8)
-    if ( !IsRopeOwnedByCrane() && m_pInterface->m_ucRopeType < ROPE_SWAT )
+    // Make sure rope still exists.
+    if ( m_pInterface->m_ucRopeType == NULL )
     {
-        g_pCore->GetConsole()->Print("something was fucked up");
         return;
     }
 
@@ -110,7 +110,7 @@ void CRopeSA::SetAttacherEntity ( CEntity * pRopeAttacherEntity )
     }
 
     m_pInterface->m_pRopeAttacherEntity = pRopeAttacherEntity->GetInterface ( );
-    m_pInterface->m_ucRopeType = ROPE_INDUSTRIAL;
+    m_pInterface->m_ucRopeType = ROPE_INDUSTRIAL2;
 
     /*
         Is this used by ropes? Test me.
@@ -119,6 +119,7 @@ void CRopeSA::SetAttacherEntity ( CEntity * pRopeAttacherEntity )
         CVector m_vecAttachedRotation;    // 268
     */
 }
+
 void CRopeSA::SetAttachedEntity ( CEntity * pEntityToAttach )
 {
     if ( m_pInterface->m_pRopeAttacherEntity )
@@ -135,10 +136,10 @@ void CRopeSA::SetAttachedEntity ( CEntity * pEntityToAttach )
         }
         else
         {
-            if ( pEntityToAttach->GetEntityType() == ENTITY_TYPE_OBJECT )
+            /*if ( pEntityToAttach->GetEntityType() == ENTITY_TYPE_OBJECT )
             {
                 pEntityToAttach->SetStatic ( false );
-            }
+            }*/
 
             DWORD dwEntityToAttachSAInterface = ( DWORD ) pEntityToAttach->GetInterface ();
             DWORD dwFunc = FUNC_CRope_PickUpObject;
@@ -155,6 +156,7 @@ void CRopeSA::SetAttachedEntity ( CEntity * pEntityToAttach )
     }
 }
 
+// Not actually segment count; todo.
 uchar CRopeSA::GetSegmentCount ( void )
 {
     return m_pInterface->m_ucSegmentCount;

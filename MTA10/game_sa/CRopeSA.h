@@ -56,7 +56,7 @@ public:
     float m_uiRopeSegmentLength;
     uint32 m_uiHoldEntityExpireTime;
     uint8 m_ucSegmentCount;
-    uint8 m_ucRopeType;
+    uint8 m_ucRopeType; // +325
 
     //uint8 m_ucFlags1;
     unsigned char m_bFlags1_1 : 1;
@@ -107,7 +107,6 @@ public:
     void                    SetSegmentLength                ( float fLength );
 
     //void                    Adjust                          ( const CVector & vecPosition );
-    //void                    SetSpeedOfTopNode               ( unsigned int uiUnk, const CVector & vecSpeed );
     bool                    IsRopeOwnedByCrane              ( void );
 };
 

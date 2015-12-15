@@ -37,7 +37,7 @@ public:
     int                         CreateRopeForSwatPed        ( const CVector & vecPosition, DWORD dwDuration = 4000 );
 
     void                        Update                      ( void );
-    void                        SetSpeedOfTopNode           ( unsigned int uiRope, const CVector & vecSpeed );
+    void                        SetSpeedOfTopNode           ( unsigned int uiRope, CVector vecSpeed );
 
     void                        DebugRope                   ( uchar ucRopeID );
 };

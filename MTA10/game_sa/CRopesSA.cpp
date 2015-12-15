@@ -164,6 +164,11 @@ void CRopesSA::DebugRope ( uchar ucRopeID )
         g_pCore->GetConsole()->Printf( "m_vecSegments[%d] = %f, %f, %f", i, pRopeInterface->m_vecSegments[i].fX, pRopeInterface->m_vecSegments[i].fY, pRopeInterface->m_vecSegments[i].fZ );
         g_pCore->GetConsole()->Printf( "m_vecSegmentsReleased[%d] = %f, %f, %f", i, pRopeInterface->m_vecSegmentsReleased[i].fX, pRopeInterface->m_vecSegmentsReleased[i].fY, pRopeInterface->m_vecSegmentsReleased[i].fZ );        
     }*/
+
+    g_pCore->GetConsole()->Printf("Crane array test");
+    g_pCore->GetConsole()->Printf( "%d", (int *) (0xB76BB8 + ucRopeID * 0x328) );
+    g_pCore->GetConsole()->Printf( "%d", (int *) (0xB76BB8 + ucRopeID * 0x328 + 4) );
+    g_pCore->GetConsole()->Printf( "%d", (int *) (0xB76BB8 + ucRopeID * 0x328 + 8) );
 }
 
 CRope * CRopesSA::CreateRope ( CVector & vecPosition, CEntity * pRopeHolder, uchar ucSegmentCount )
@@ -205,8 +210,7 @@ CRope * CRopesSA::CreateRope ( CVector & vecPosition, CEntity * pRopeHolder, uch
 
     bool bReturn = false;
     // Create rope as SWAT rope so it won't have problems with last segment if there is no magnet attached
-  //char ucRopeType = ROPE_SWAT;
-    char ucRopeType = 1;
+    char ucRopeType = ROPE_SWAT;
     bool bExpires = false;
     
     // NOT A SEGMENT COUNT. Rope always have 32 segments.
@@ -231,8 +235,7 @@ CRope * CRopesSA::CreateRope ( CVector & vecPosition, CEntity * pRopeHolder, uch
         push    fY
         push    fX
         push    ucRopeType
-      //push    pRopeEntityInterface
-        push    pRopeHolderInterface
+        push    pRopeEntityInterface
         call    dwFunc
         add     esp, 4*10
         mov     bReturn, al
@@ -254,6 +257,9 @@ CRope * CRopesSA::CreateRope ( CVector & vecPosition, CEntity * pRopeHolder, uch
     pRopeInterface->m_bSegmentGroundCheck = true;
 
     DebugRope ( ucFreeSlot );
+
+    SetSpeedOfTopNode ( ucFreeSlot, CVector(0, 0, -1) );
+
     return ( CRope * ) Ropes [ ucFreeSlot ];
 }
 
@@ -290,7 +296,7 @@ void CRopesSA::Update ( void )
 }
 
 // Untested. Change uiRope to CRope later
-void CRopesSA::SetSpeedOfTopNode ( unsigned int uiRope, const CVector & vecSpeed )
+void CRopesSA::SetSpeedOfTopNode ( unsigned int uiRope, CVector vecSpeed )
 {
     DWORD dwFunc = FUNC_CRopes_SetSpeedOfTopNode;
     DWORD dwReturn = 0;
