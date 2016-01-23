@@ -4117,6 +4117,13 @@ bool CStaticFunctionDefinitions::CreateFire ( CVector& vecPosition, float fSize 
 }
 
 
+bool CStaticFunctionDefinitions::ExtinguishPoint ( CVector& vecPosition, float fRadius )
+{
+    g_pGame->GetFireManager ()->ExtinguishPoint ( vecPosition, fRadius );
+    return true;
+}
+
+
 bool CStaticFunctionDefinitions::PlaySoundFrontEnd ( unsigned char ucSound )
 {
     g_pGame->GetAudioEngine ()->PlayFrontEndSound ( ucSound );

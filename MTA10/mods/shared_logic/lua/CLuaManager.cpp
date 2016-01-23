@@ -606,6 +606,7 @@ void CLuaManager::LoadCFunctions ( void )
 
     // Fire funcs
     CLuaCFunctions::AddFunction ( "createFire", CLuaFunctionDefs::CreateFire );
+    CLuaCFunctions::AddFunction ( "extinguishPoint", CLuaFunctionDefs::ExtinguishPoint );
 
     // PointLights funcs
     CLuaCFunctions::AddFunction ( "createLight", CLuaFunctionDefs::CreateLight );

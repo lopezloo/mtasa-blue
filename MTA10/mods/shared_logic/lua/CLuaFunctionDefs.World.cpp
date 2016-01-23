@@ -73,6 +73,31 @@ int CLuaFunctionDefs::CreateFire ( lua_State* luaVM )
 }
 
 
+int CLuaFunctionDefs::ExtinguishPoint ( lua_State* luaVM )
+{
+//  bool extinguishPoint ( float x, float y, float z, float radius )
+    CVector vecPosition; float fRadius;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadVector3D ( vecPosition );
+    argStream.ReadNumber ( fRadius );
+
+    if ( !argStream.HasErrors () )
+    {
+        if ( CStaticFunctionDefinitions::ExtinguishPoint ( vecPosition, fRadius ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+
 int CLuaFunctionDefs::GetTime_ ( lua_State* luaVM )
 {
     // Get the time

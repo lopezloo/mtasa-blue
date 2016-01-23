@@ -442,6 +442,7 @@ public:
 
     // Fire functions
     LUA_DECLARE ( CreateFire );
+    LUA_DECLARE ( ExtinguishPoint );
 
     // PointLights functions
     LUA_DECLARE ( CreateLight );
