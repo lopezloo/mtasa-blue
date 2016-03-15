@@ -128,6 +128,8 @@ public:
     void        SetMass                     ( float fMass );
     float       GetTurnMass                 ( void );
     void        SetTurnMass                 ( float fTurnMass );
+    float       GetAirResistance            ( void );
+    void        SetAirResistance            ( float fAirResistance );
     float       GetElasticity               ( void );
     void        SetElasticity               ( float fElasticity );
     float       GetBuoyancyConstant         ( void );
@@ -156,8 +158,6 @@ public:
     /*
     VOID        SetMassMultiplier(FLOAT fMassMultiplier);
     FLOAT       GetMassMultiplier();
-    VOID        SetAirResistance(FLOAT fAirResistance);
-    FLOAT       GetAirResistance();
     VOID        SetCenterOfMass(CVector * vecCenterOfMass);
     CVector * GetCenterOfMass();
 

@@ -145,6 +145,17 @@ void CPhysicalSA::SetTurnMass ( float fTurnMass )
     ((CPhysicalSAInterface *)this->GetInterface())->m_fTurnMass = fTurnMass;
 }
 
+float CPhysicalSA::GetAirResistance ( void )
+{
+    return ((CPhysicalSAInterface *)this->GetInterface())->m_fAirResistance;
+}
+
+
+void CPhysicalSA::SetAirResistance ( float fAirResistance )
+{
+    ((CPhysicalSAInterface *)this->GetInterface())->m_fAirResistance = fAirResistance;
+}
+
 
 float CPhysicalSA::GetElasticity ( void )
 {

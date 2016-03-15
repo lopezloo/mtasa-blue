@@ -301,6 +301,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "isElementLowLOD", CLuaFunctionDefs::IsElementLowLod );
     CLuaCFunctions::AddFunction ( "isElementCallPropagationEnabled", CLuaFunctionDefs::IsElementCallPropagationEnabled );
     CLuaCFunctions::AddFunction ( "isElementWaitingForGroundToLoad", CLuaFunctionDefs::IsElementWaitingForGroundToLoad );
+    CLuaCFunctions::AddFunction ( "getElementPhysicalProperty", CLuaFunctionDefs::GetElementPhysicalProperty );
 
     // Element set funcs
     CLuaCFunctions::AddFunction ( "createElement", CLuaFunctionDefs::CreateElement );
@@ -328,6 +329,7 @@ void CLuaManager::LoadCFunctions ( void )
     CLuaCFunctions::AddFunction ( "setElementFrozen", CLuaFunctionDefs::SetElementFrozen );
     CLuaCFunctions::AddFunction ( "setLowLODElement", CLuaFunctionDefs::SetLowLodElement );
     CLuaCFunctions::AddFunction ( "setElementCallPropagationEnabled", CLuaFunctionDefs::SetElementCallPropagationEnabled );
+    CLuaCFunctions::AddFunction ( "setElementPhysicalProperty", CLuaFunctionDefs::SetElementPhysicalProperty );
 
     // Sound effects and synth funcs
     CLuaCFunctions::AddFunction ( "playSound", CLuaFunctionDefs::PlaySound );

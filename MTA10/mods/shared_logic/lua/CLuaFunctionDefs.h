@@ -162,6 +162,7 @@ public:
     LUA_DECLARE ( IsElementLowLod );
     LUA_DECLARE ( IsElementCallPropagationEnabled );
     LUA_DECLARE ( IsElementWaitingForGroundToLoad );
+    LUA_DECLARE ( GetElementPhysicalProperty );
 
     // Element set funcs
     LUA_DECLARE ( CreateElement );
@@ -189,6 +190,7 @@ public:
     LUA_DECLARE ( SetElementFrozen );
     LUA_DECLARE ( SetLowLodElement );
     LUA_DECLARE ( SetElementCallPropagationEnabled );
+    LUA_DECLARE ( SetElementPhysicalProperty );
 
     // Radio functions
     LUA_DECLARE ( SetRadioChannel );

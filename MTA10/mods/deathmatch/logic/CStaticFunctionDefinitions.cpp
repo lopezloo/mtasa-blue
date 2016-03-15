@@ -3653,6 +3653,11 @@ bool CStaticFunctionDefinitions::IsElementCallPropagationEnabled ( CClientEntity
     return true;
 }
 
+bool CStaticFunctionDefinitions::GetElementPhysicalProperty ( CClientEntity& Entity, ePhysicalPropertyType eProperty, float& fValue )
+{
+    return Entity.GetPhysicalProperty ( eProperty, fValue );
+}
+
 
 bool CStaticFunctionDefinitions::SetElementCallPropagationEnabled ( CClientEntity& Entity, bool bEnabled )
 {

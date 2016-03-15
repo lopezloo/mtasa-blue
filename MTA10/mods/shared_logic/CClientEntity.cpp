@@ -66,6 +66,12 @@ CClientEntity::CClientEntity ( ElementID ID )
 
     m_bWorldIgnored = false;
     g_pCore->UpdateDummyProgress();
+
+
+    for ( uchar i = 0; i < MAX_PHYSICAL_PROPERTIES; i++ )
+    {
+        m_fPhysicalProperties [ i ] = -1;
+    }
 }
 
 
@@ -1665,4 +1671,128 @@ CElementListSnapshot* CClientEntity::GetChildrenListSnapshot( void )
     }
 
     return m_pChildrenListSnapshot;
+}
+
+void CClientEntity::ApplyPhysicalProperties ( void )
+{
+    // Should be called when entity got streamed in (::Create)
+    for ( uchar i = 0; i < MAX_PHYSICAL_PROPERTIES; i++ )
+    {
+        if ( m_fPhysicalProperties [ i ] != -1 )
+        {
+            SetPhysicalProperty ( ( ePhysicalPropertyType ) i, m_fPhysicalProperties [ i ] );
+        }
+    }
+}
+
+bool CClientEntity::SetPhysicalProperty ( ePhysicalPropertyType eType, float fValue )
+{
+    if ( ( GetType() == CCLIENTOBJECT || GetType() == CCLIENTVEHICLE ) )
+    {
+        m_fPhysicalProperties [ eType ] = fValue;
+
+        CPhysical * pPhysical = dynamic_cast < CPhysical * > ( GetGameEntity () );
+        if ( pPhysical )
+        {
+            switch ( eType )
+            {
+                case PHYSICAL_PROPERTY_MASS:
+                {
+                    if ( fValue == 0 )
+                        return false;
+                    pPhysical->SetMass ( fValue );
+                    return true;
+                }
+                case PHYSICAL_PROPERTY_TURNMASS:
+                {
+                    if ( fValue == 0 )
+                        return false;
+                    pPhysical->SetTurnMass ( fValue );
+                    return true;
+                }
+                case PHYSICAL_PROPERTY_AIRRESISTANCE:
+                {
+                    pPhysical->SetAirResistance ( fValue );
+                    return true;
+                }
+                case PHYSICAL_PROPERTY_ELASTICITY:
+                {
+                    pPhysical->SetElasticity ( fValue );
+                    return true;
+                }
+                case PHYSICAL_PROPERTY_PERCENTSUBMERGED:
+                {
+                    pPhysical->SetBuoyancyConstant ( fValue );
+                    return true;
+                }
+                case PHYSICAL_PROPERTY_UPROOTLIMIT:
+                {
+                
+                    return true;
+                }
+                case PHYSICAL_PROPERTY_COLLISIONDMGMULTIPLIER:
+                {
+                    pPhysical->SetDamageImpulseMagnitude ( fValue );
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+bool CClientEntity::GetPhysicalProperty ( ePhysicalPropertyType eType, float& fValue )
+{
+    if ( GetType() == CCLIENTOBJECT || GetType() == CCLIENTVEHICLE )
+    {
+        CPhysical * pPhysical = dynamic_cast < CPhysical * > ( GetGameEntity () );
+        if ( pPhysical )
+        {
+            switch ( eType )
+            {
+                case PHYSICAL_PROPERTY_MASS:
+                {
+                    fValue = pPhysical->GetMass ();
+                    return true;
+                }
+                case PHYSICAL_PROPERTY_TURNMASS:
+                {
+                    fValue = pPhysical->GetTurnMass ();
+                    return true;
+                }
+                case PHYSICAL_PROPERTY_AIRRESISTANCE:
+                {
+                    fValue = pPhysical->GetAirResistance ();
+                    return true;
+                }
+                case PHYSICAL_PROPERTY_ELASTICITY:
+                {
+                    fValue = pPhysical->GetElasticity ();
+                    return true;
+                }
+                case PHYSICAL_PROPERTY_PERCENTSUBMERGED:
+                {
+                    // not same thing as percent submerged
+                    fValue = pPhysical->GetBuoyancyConstant ( );
+                    return true;
+                }
+                case PHYSICAL_PROPERTY_UPROOTLIMIT:
+                {
+                
+                    return true;
+                }
+                case PHYSICAL_PROPERTY_COLLISIONDMGMULTIPLIER:
+                {
+                    fValue = pPhysical->GetDamageImpulseMagnitude ( );
+                    return true;
+                }
+            }
+        }
+        if ( m_fPhysicalProperties [ eType ] != -1 )
+        {
+            fValue = m_fPhysicalProperties [ eType ];
+            return true;
+        }
+    }
+    return false;
 }

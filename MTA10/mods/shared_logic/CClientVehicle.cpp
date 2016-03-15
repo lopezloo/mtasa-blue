@@ -2862,6 +2862,8 @@ void CClientVehicle::Create ( void )
         if ( m_pUpgrades )
             m_pUpgrades->ReAddAll ();
 
+        ApplyPhysicalProperties ();
+
         if ( m_ComponentData.empty ( ) )
         {
             // grab our map of components

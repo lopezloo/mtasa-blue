@@ -524,8 +524,9 @@ void CClientObject::Create ( void )
                 m_pObject->SetHealth ( m_fHealth );
 
                 // Set object mass
-                if ( m_fMass != -1.0f )
-                    m_pObject->SetMass ( m_fMass );
+                //if ( m_fMass != -1.0f )
+                //    m_pObject->SetMass ( m_fMass );
+                ApplyPhysicalProperties ();
 
                 // Reattach to an entity + any entities attached to this
                 ReattachEntities ();

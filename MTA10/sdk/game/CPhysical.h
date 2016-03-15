@@ -28,6 +28,8 @@ public:
     virtual void        SetMass                     ( float fMass ) = 0;
     virtual float       GetTurnMass                 ( void ) = 0;
     virtual void        SetTurnMass                 ( float fTurnMass ) = 0;
+    virtual float       GetAirResistance            ( void ) = 0;
+    virtual void        SetAirResistance            ( float fAirResistance ) = 0;
     virtual float       GetElasticity               ( void ) = 0;
     virtual void        SetElasticity               ( float fElasticity ) = 0;
     virtual float       GetBuoyancyConstant         ( void ) = 0;

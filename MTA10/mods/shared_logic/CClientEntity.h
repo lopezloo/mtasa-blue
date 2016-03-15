@@ -150,6 +150,19 @@ enum eCClientEntityClassTypes
     CLASS_CClientSearchLight
 };
 
+enum ePhysicalPropertyType
+{
+    PHYSICAL_PROPERTY_INVALID = -1,
+    PHYSICAL_PROPERTY_MASS,
+    PHYSICAL_PROPERTY_TURNMASS,
+    PHYSICAL_PROPERTY_AIRRESISTANCE,
+    PHYSICAL_PROPERTY_ELASTICITY,
+    PHYSICAL_PROPERTY_PERCENTSUBMERGED,
+    PHYSICAL_PROPERTY_UPROOTLIMIT,
+    PHYSICAL_PROPERTY_COLLISIONDMGMULTIPLIER,
+    MAX_PHYSICAL_PROPERTIES,
+};
+
 
 class CClientEntity : public CClientEntityBase
 {
@@ -325,6 +338,10 @@ public:
     bool                                        IsCallPropagationEnabled    ( void )                { return m_bCallPropagationEnabled; }
     virtual void                                SetCallPropagationEnabled   ( bool bEnabled )       { m_bCallPropagationEnabled = bEnabled; }
 
+    void                                        ApplyPhysicalProperties     ( void );
+    bool                                        SetPhysicalProperty         ( ePhysicalPropertyType eType, float fValue );
+    bool                                        GetPhysicalProperty         ( ePhysicalPropertyType eType, float& fValue );
+
 protected:
     CClientManager*                             m_pManager;
     CClientEntity*                              m_pParent;
@@ -369,6 +386,8 @@ protected:
     bool                                        m_bDoubleSidedInit;
     bool                                        m_bWorldIgnored;
     bool                                        m_bCallPropagationEnabled;
+
+    SFixedArray < float, MAX_PHYSICAL_PROPERTIES >    m_fPhysicalProperties;
 
 public:
     // Optimization for getElementsByType starting at root

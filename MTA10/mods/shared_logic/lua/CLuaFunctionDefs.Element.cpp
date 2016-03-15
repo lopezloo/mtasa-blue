@@ -2405,3 +2405,84 @@ int CLuaFunctionDefs::IsElementWaitingForGroundToLoad ( lua_State* luaVM )
     lua_pushboolean ( luaVM, false );
     return 1;
 }
+
+int CLuaFunctionDefs::SetElementPhysicalProperty ( lua_State* luaVM )
+{
+// bool setElementPhysicalProperty ( element theElement, string property, float value );
+    CClientEntity * pEntity; SString szProperty; float fValue;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+    argStream.ReadString ( szProperty );
+    argStream.ReadNumber ( fValue );
+
+    if ( !argStream.HasErrors () )
+    {
+        ePhysicalPropertyType eProperty = PHYSICAL_PROPERTY_INVALID;
+        if ( szProperty == "mass" )
+            eProperty = PHYSICAL_PROPERTY_MASS;
+        else if ( szProperty == "turnmass" )
+            eProperty = PHYSICAL_PROPERTY_TURNMASS;
+        else if ( szProperty == "airresistance" )
+            eProperty = PHYSICAL_PROPERTY_AIRRESISTANCE;
+        else if ( szProperty == "elasticity" )
+            eProperty = PHYSICAL_PROPERTY_ELASTICITY;
+        else if ( szProperty == "percentsubmerged" )
+            eProperty = PHYSICAL_PROPERTY_PERCENTSUBMERGED;
+        else if ( szProperty == "uprootlimit" )
+            eProperty = PHYSICAL_PROPERTY_UPROOTLIMIT;
+        else if ( szProperty == "collisiondamagemultiplier" )
+            eProperty = PHYSICAL_PROPERTY_COLLISIONDMGMULTIPLIER;
+
+        if ( eProperty != PHYSICAL_PROPERTY_INVALID && pEntity->SetPhysicalProperty ( eProperty, fValue ) )
+        {
+            lua_pushboolean ( luaVM, true );
+            return 1;
+        }        
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}
+
+int CLuaFunctionDefs::GetElementPhysicalProperty ( lua_State* luaVM )
+{
+// bool getElementPhysicalProperty ( element theElement, string property );
+    CClientEntity * pEntity; SString szProperty; float fValue;
+
+    CScriptArgReader argStream ( luaVM );
+    argStream.ReadUserData ( pEntity );
+    argStream.ReadString ( szProperty );
+
+    if ( !argStream.HasErrors () )
+    {
+        ePhysicalPropertyType eProperty = PHYSICAL_PROPERTY_INVALID;
+        if ( szProperty == "mass" )
+            eProperty = PHYSICAL_PROPERTY_MASS;
+        else if ( szProperty == "turnmass" )
+            eProperty = PHYSICAL_PROPERTY_TURNMASS;
+        else if ( szProperty == "airresistance" )
+            eProperty = PHYSICAL_PROPERTY_AIRRESISTANCE;
+        else if ( szProperty == "elasticity" )
+            eProperty = PHYSICAL_PROPERTY_ELASTICITY;
+        else if ( szProperty == "percentsubmerged" )
+            eProperty = PHYSICAL_PROPERTY_PERCENTSUBMERGED;
+        else if ( szProperty == "uprootlimit" )
+            eProperty = PHYSICAL_PROPERTY_UPROOTLIMIT;
+        else if ( szProperty == "collisiondamagemultiplier" )
+            eProperty = PHYSICAL_PROPERTY_COLLISIONDMGMULTIPLIER;
+
+        if ( eProperty != PHYSICAL_PROPERTY_INVALID && pEntity->GetPhysicalProperty ( eProperty, fValue ) )
+        {
+            lua_pushnumber ( luaVM, fValue );
+            return 1;
+        }        
+    }
+    else
+        m_pScriptDebugging->LogCustom ( luaVM, argStream.GetFullErrorMessage() );
+
+    lua_pushboolean ( luaVM, false );
+    return 1;
+}

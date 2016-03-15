@@ -85,6 +85,7 @@ public:
     static bool                         GetLowLodElement                    ( CClientEntity& Entity, CClientEntity*& pOutLowLodEntity );
     static bool                         IsElementLowLod                     ( CClientEntity& Entity, bool& bOutIsLowLod );
     static bool                         IsElementCallPropagationEnabled     ( CClientEntity& Entity, bool& bOutEnabled );
+    static bool                         GetElementPhysicalProperty          ( CClientEntity& Entity, ePhysicalPropertyType eProperty, float& fValue );
 
     // Element set funcs
     static CClientDummy*                CreateElement                       ( CResource& Resource, const char* szTypeName, const char* szID );
