@@ -35,6 +35,15 @@
 CCriticalSection CRefCountable::ms_CS;
 std::map < uint, uint > ms_ReportAmountMap;
 
+struct SReportLine
+{
+    SString strText;
+    uint    uiId;
+    operator SString&   ( void )                            { return strText; }
+    bool operator ==    ( const SReportLine& other ) const  { return strText == other.strText && uiId == other.uiId; }
+};
+CDuplicateLineFilter < SReportLine > ms_ReportLineFilter;
+
 #ifdef MTA_CLIENT
 
 #define TROUBLE_URL1 "http://updatesa.multitheftauto.com/sa/trouble/?v=_VERSION_&id=_ID_&tr=_TROUBLE_"
@@ -688,12 +697,21 @@ void SharedUtil::AddReportLog ( uint uiId, const SString& strText, uint uiAmount
             return;
     }
 
-    SString strPathFilename = PathJoin ( GetMTADataPath (), "report.log" );
-    MakeSureDirExists ( strPathFilename );
+    ms_ReportLineFilter.AddLine( { strText, uiId } );
 
-    SString strMessage ( "%u: %s %s [%s] - %s\n", uiId, GetTimeString ( true, false ).c_str (), GetReportLogHeaderText ().c_str (), GetReportLogProcessTag().c_str (), strText.c_str () );
-    FileAppend ( strPathFilename, &strMessage.at ( 0 ), strMessage.length () );
-    OutputDebugLine ( SStringX ( "[ReportLog] " ) + strMessage );
+    SReportLine line;
+    while ( ms_ReportLineFilter.PopOutputLine( line ) )
+    {
+        const SString& strText = line.strText;
+        uint uiId = line.uiId;
+    
+        SString strPathFilename = PathJoin ( GetMTADataPath (), "report.log" );
+        MakeSureDirExists ( strPathFilename );
+    
+        SString strMessage ( "%u: %s %s [%s] - %s\n", uiId, GetTimeString ( true, false ).c_str (), GetReportLogHeaderText ().c_str (), GetReportLogProcessTag().c_str (), strText.c_str () );
+        FileAppend ( strPathFilename, &strMessage.at ( 0 ), strMessage.length () );
+        OutputDebugLine ( SStringX ( "[ReportLog] " ) + strMessage );
+    }
 }
 
 void SharedUtil::SetReportLogContents ( const SString& strText )
@@ -962,6 +980,11 @@ bool SharedUtil::IsWindowsXPSP3OrGreater()
 bool SharedUtil::IsWindowsVistaOrGreater()
 {
     return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_VISTA), LOBYTE(_WIN32_WINNT_VISTA), 0);
+}
+
+bool SharedUtil::IsWindows7OrGreater()
+{
+    return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WIN7), LOBYTE(_WIN32_WINNT_WIN7), 0);
 }
 
 bool SharedUtil::IsWindows8OrGreater()
@@ -1340,8 +1363,8 @@ bool SharedUtil::IsLuaCompiledScript( const void* pData, uint uiLength )
     return ( uiLength > 0 && pCharData[0] == 0x1B );    // Do the same check as what the Lua parser does
 }
 
-// Check for encypted script
-bool SharedUtil::IsLuaEncryptedScript( const void* pData, uint uiLength )
+// Check for obfuscated script
+bool SharedUtil::IsLuaObfuscatedScript( const void* pData, uint uiLength )
 {
     const uchar* pCharData = (const uchar*)pData;
     return ( uiLength > 0 && pCharData[0] == 0x1C );    // Look for our special marker

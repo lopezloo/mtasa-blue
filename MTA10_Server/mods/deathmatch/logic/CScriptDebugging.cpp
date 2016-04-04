@@ -26,6 +26,14 @@ CScriptDebugging::CScriptDebugging ( CLuaManager* pLuaManager )
     m_bTriggeringOnDebugMessage = false;
 }
 
+CScriptDebugging::~CScriptDebugging ( void )
+{
+    // Flush any pending duplicate loggings
+    m_DuplicateLineFilter.Flush();
+    UpdateLogOutput();
+
+    ClearPlayers ();
+}
 
 bool CScriptDebugging::AddPlayer ( CPlayer& Player, unsigned int uiLevel )
 {
@@ -214,7 +222,10 @@ void CScriptDebugging::LogPCallError( lua_State* luaVM, const SString& strRes, b
         // File+line info present
         SString strFile = vecSplit[ 0 ];
         int     iLine   = atoi( vecSplit[ 1 ] );
-        SString strMsg  = vecSplit[2].SubStr( 1 );
+        
+        // Get the message string (we cannot use vecSplit here as the message itself could contain ':')
+        auto pos = strRes.find ( ':', vecSplit[0].length () + vecSplit[1].length () ) ;
+        SString strMsg = strRes.SubStr ( pos+2 );
 
         if ( iLine == 0 && bInitialCall )
         {
@@ -386,40 +397,28 @@ void CScriptDebugging::LogString ( const char* szPrePend, const SLuaDebugInfo& l
         m_bTriggeringOnDebugMessage = false;
     }
 
-    // Log it to the file if enough level
-    if ( m_uiLogFileLevel >= uiMinimumDebugLevel )
-    {
-        PrintLog ( strText );
-    }
-
-    // Log to console
-    CLogger::LogPrintf( "%s\n", strText.c_str () );
-
-#if 0
-    // Not sure what this is for, seems pretty useless
-    if ( m_uiHtmlLogLevel >= uiMinimumDebugLevel )
-    {
-        if ( luaVM )
-        {
-            CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine ( luaVM );
-            if ( pLuaMain )
-            {
-                CResourceFile * file = pLuaMain->GetResourceFile();
-                if ( file && file->GetType() == CResourceHTMLItem::RESOURCE_FILE_TYPE_HTML )
-                {
-                    CResourceHTMLItem * html = (CResourceHTMLItem *)file;
-                    html->AppendToPageBuffer ( strText );
-                    html->AppendToPageBuffer ( "<br/>" );
-                }
-            }
-        }
-    }
-#endif
-
-    // Tell the players
-    Broadcast ( CDebugEchoPacket ( strText, uiMinimumDebugLevel, ucRed, ucGreen, ucBlue ), uiMinimumDebugLevel );
+    m_DuplicateLineFilter.AddLine( { strText, uiMinimumDebugLevel, ucRed, ucGreen, ucBlue } );
+    if ( g_pGame->GetConfig()->GetFilterDuplicateLogLinesEnabled() == false )
+        m_DuplicateLineFilter.Flush();
+    UpdateLogOutput();
 }
 
+void CScriptDebugging::UpdateLogOutput( void )
+{
+    SLogLine line;
+    while( m_DuplicateLineFilter.PopOutputLine( line ) )
+    {
+        // Log it to the file if enough level
+        if ( m_uiLogFileLevel >= line.uiMinimumDebugLevel )
+        {
+            PrintLog ( line.strText );
+        }
+        // Log to console
+        CLogger::LogPrintf( "%s\n", line.strText.c_str () );
+        // Tell the players
+        Broadcast ( CDebugEchoPacket ( line.strText, line.uiMinimumDebugLevel, line.ucRed, line.ucGreen, line.ucBlue ), line.uiMinimumDebugLevel );
+    }
+}
 
 void CScriptDebugging::PrintLog ( const char* szText )
 {

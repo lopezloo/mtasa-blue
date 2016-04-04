@@ -9,8 +9,9 @@
 *
 *****************************************************************************/
 
-#ifndef __CLUADEFS_H
-#define __CLUADEFS_H
+#pragma once
+#define LUA_DECLARE(x) static int x ( lua_State * luaVM ); 
+#define LUA_DECLARE_OOP(x) LUA_DECLARE(x) LUA_DECLARE(OOP_##x)
 
 class CClientColManager;
 class CClientColModelManager;
@@ -26,6 +27,7 @@ class CClientPlayerManager;
 class CClientRadarMarkerManager;
 class CClientTeamManager;
 class CClientVehicleManager;
+class CElementDeleter;
 class CLuaManager;
 class CRegisteredCommands;
 class CRenderWare;
@@ -42,9 +44,10 @@ public:
     static int                          CanUseFunction ( lua_CFunction f, lua_State* luaVM );
     static void                         DidUseFunction ( lua_CFunction f, lua_State* luaVM );
 
-// This is just for the LUA funcs. Please don't public this and use it other
+// This is just for the Lua funcs. Please don't public this and use it other
 // places in the client.
 public:
+    static CElementDeleter*             m_pElementDeleter;
     static CLuaManager*                 m_pLuaManager;
     static CScriptDebugging*            m_pScriptDebugging;
     static class CClientGame*           m_pClientGame;
@@ -65,5 +68,3 @@ public:
     static CClientColModelManager*      m_pColModelManager;
     static CRegisteredCommands*         m_pRegisteredCommands;  
 };
-
-#endif

@@ -190,6 +190,7 @@ public:
     void                        SetDrawRadarAreasHandler    ( DrawRadarAreasHandler * pRadarAreasHandler );
     void                        SetRender3DStuffHandler     ( Render3DStuffHandler * pHandler );
     void                        SetPreRenderSkyHandler      ( PreRenderSkyHandler * pHandler );
+    void                        SetRenderHeliLightHandler   ( RenderHeliLightHandler* pHandler );
 
     void                        Reset                       ();
 
@@ -280,6 +281,7 @@ private:
     bool                        m_bHeatHazeEnabled;
     bool                        m_bHeatHazeCustomized;
     float                       m_fNearClipDistance;
+    float                       m_fMaddDoggPoolLevel;
 
 /*  VOID                        SetPlayerShotVectors(CPlayerPed* player, Vector3D * vecTarget, Vector3D * vecStart);
     VOID                        SetPlayerCameraVectors(CPlayerPed* player, Vector3D * vecSource, Vector3D * vecFront);

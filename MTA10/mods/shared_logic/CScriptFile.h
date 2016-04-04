@@ -46,6 +46,7 @@ public:
     void                    Unload                  ( void );
     bool                    IsLoaded                ( void )    { return m_pFile != NULL; };
     const SString&          GetFilePath             ( void )    { return m_strFilename; };
+    const SString&          GetAbsPath              ( void )    { return m_strAbsPath; };
 
     // Get the owning resource
     CResource*              GetResource             ( void );
@@ -59,14 +60,15 @@ public:
     long                    SetPointer              ( unsigned long ulPosition );
 
     void                    Flush                   ( void );
-    long                    Read                    ( unsigned long ulSize, char* pData );
+    long                    Read                    ( unsigned long ulSize, CBuffer& outBuffer );
     long                    Write                   ( unsigned long ulSize, const char* pData );
 
 private:
     void                    DoResourceFileCheck     ( void );
 
     CBinaryFileInterface*   m_pFile;
-    SString                 m_strFilename;
+    SString                 m_strFilename;      // Resource relative
+    SString                 m_strAbsPath;       // Absolute
     unsigned long           m_ulMaxSize;
     bool                    m_bDoneResourceFileCheck;
     unsigned int            m_uiScriptId;

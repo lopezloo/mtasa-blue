@@ -41,23 +41,23 @@ bool CScriptFile::Load( CResource* pResourceForFilePath, eMode Mode )
         m_bDoneResourceFileCheck = false;
         m_pFile = g_pNet->AllocateBinaryFile ();
         bool bOk = false;
-        SString strAbsPath = pResourceForFilePath->GetResourceDirectoryPath( m_accessType, m_strFilename );
+        m_strAbsPath = pResourceForFilePath->GetResourceDirectoryPath( m_accessType, m_strFilename );
         switch ( Mode )
         {
             // Open file in read only binary mode
             case MODE_READ:
-                bOk = m_pFile->FOpen( strAbsPath.c_str( ), "rb", true );
+                bOk = m_pFile->FOpen( m_strAbsPath, "rb", true );
                 break;
 
             // Open file in read write binary mode.
             case MODE_READWRITE:
                 // Try to load the file in rw mode. Use existing content.
-                bOk = m_pFile->FOpen( strAbsPath.c_str( ), "rb+", true );
+                bOk = m_pFile->FOpen( m_strAbsPath, "rb+", true );
                 break;
 
             // Open file in read write binary mode. Truncate size to 0.
             case MODE_CREATE:
-                bOk = m_pFile->FOpen( strAbsPath.c_str( ), "wb+", true );
+                bOk = m_pFile->FOpen( m_strAbsPath, "wb+", true );
                 break;
         }
 
@@ -162,15 +162,26 @@ void CScriptFile::Flush ( void )
 }
 
 
-long CScriptFile::Read ( unsigned long ulSize, char* pData )
+long CScriptFile::Read ( unsigned long ulSize, CBuffer& outBuffer )
 {
     if ( !m_pFile )
         return -1;
 
     DoResourceFileCheck();
 
-    // Try to read data into the given block. Return number of bytes we read.
-    return m_pFile->FRead ( pData, ulSize );
+    // If read size is large, limit it to how many bytes can be read (avoid memory problems with over allocation)
+    if ( ulSize > 10000 )
+    {
+        long lCurrentPos = m_pFile->FTell ();
+        m_pFile->FSeek ( 0, SEEK_END );
+        long lFileSize = m_pFile->FTell ();
+        m_pFile->FSeek ( lCurrentPos, SEEK_SET );
+        ulSize = Min < unsigned long > ( 1 + lFileSize - lCurrentPos, ulSize );
+        // Note: Read extra byte at end so EOF indicator gets set
+    }
+
+    outBuffer.SetSize( ulSize );
+    return m_pFile->FRead ( outBuffer.GetData(), ulSize );
 }
 
 

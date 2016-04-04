@@ -52,7 +52,7 @@ class CCore;
 #include <dinput.h>
 
 #define BLUE_VERSION_STRING     "Multi Theft Auto v" MTA_DM_BUILDTAG_LONG
-#define BLUE_COPYRIGHT_STRING    _td("Copyright (C) 2003 - 2015 Multi Theft Auto")
+#define BLUE_COPYRIGHT_STRING    _td("Copyright (C) 2003 - 2016 Multi Theft Auto")
 
 // Configuration file path (relative to MTA install directory)
 #define MTA_CONFIG_PATH             "mta/config/coreconfig.xml"
@@ -154,8 +154,7 @@ public:
     // Net
     void                    SetConnected                    ( bool bConnected );
     bool                    IsConnected                     ( void );
-    bool                    Reconnect                       ( const char* szHost, unsigned short usPort, const char* szPassword, bool bSave = true, bool bForceInternalHTTPServer = false );
-    bool                    ShouldUseInternalHTTPServer     ( void );
+    bool                    Reconnect                       ( const char* szHost, unsigned short usPort, const char* szPassword, bool bSave = true );
 
     // Mod
     void                    SetOfflineMod                   ( bool bOffline );

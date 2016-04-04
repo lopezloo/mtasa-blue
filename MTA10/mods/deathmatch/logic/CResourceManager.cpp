@@ -102,20 +102,8 @@ CResource* CResourceManager::GetResource ( const char* szResourceName )
     return NULL;
 }
 
-
 void CResourceManager::OnDownloadGroupFinished( void )
 {
-    // Clear downloading flags
-    for ( std::list < CResource* > ::const_iterator iter = m_resources.begin() ; iter != m_resources.end(); ++iter )
-    {
-        CResource* pResource = *iter;
-        if ( pResource->IsDownloading() )
-            pResource->SetIsDownloading( false );
-    }
-
-    // Start next download group
-    UpdatePendingDownloads();
-
     // Try to load newly ready resources
     for ( std::list < CResource* > ::const_iterator iter = m_resources.begin() ; iter != m_resources.end(); ++iter )
     {
@@ -123,54 +111,12 @@ void CResourceManager::OnDownloadGroupFinished( void )
         if ( !pResource->IsActive() )
         {
             // Stop as soon as we hit a resource which hasn't downloaded yet (as per previous behaviour)
-            if ( pResource->HasPendingFileDownloads() || pResource->IsDownloading() )
+            if ( pResource->IsWaitingForInitialDownloads() )
                 break;
             pResource->Load();
         }
     }
 }
-
-
-void CResourceManager::UpdatePendingDownloads( void )
-{
-    // Check currently active group
-    int iGroup = g_pClientGame->GetActiveDownloadPriorityGroup();
-    if ( iGroup == INVALID_DOWNLOAD_PRIORITY_GROUP )
-    {
-        // If no group is active, then find highest priority to make active
-        for ( std::list < CResource* > ::const_iterator iter = m_resources.begin() ; iter != m_resources.end(); ++iter )
-        {
-            CResource* pResource = *iter;
-            if ( pResource->HasPendingFileDownloads() )
-            {
-                iGroup = Max( iGroup, pResource->GetDownloadPriorityGroup() );
-            }
-        }
-
-        // Anything to do?
-        if ( iGroup == INVALID_DOWNLOAD_PRIORITY_GROUP )
-        {
-            return;
-        }
-
-        // Make new group active
-        g_pClientGame->SetTransferringInitialFiles( true, iGroup );
-    }
-
-    // Do start matching groups
-    for ( std::list < CResource* > ::const_iterator iter = m_resources.begin() ; iter != m_resources.end(); ++iter )
-    {
-        CResource* pResource = *iter;
-        if ( pResource->HasPendingFileDownloads() )
-        {
-            if ( pResource->GetDownloadPriorityGroup() == iGroup )
-            {
-                pResource->StartPendingFileDownloads();
-            }
-        }
-    }
-}
-
 
 bool CResourceManager::RemoveResource ( unsigned short usNetID )
 {
@@ -291,15 +237,15 @@ bool CResourceManager::IsResourceFile( const SString& strInFilename )
 }
 
 // Remove this file from the checks as it has been changed by script actions
-void CResourceManager::FileModifedByScript( const SString& strInFilename )
+void CResourceManager::OnFileModifedByScript( const SString& strInFilename )
 {
     SString strFilename = PathConform( strInFilename ).ToLower();
     CDownloadableResource* pResourceFile = MapFindRef( m_ResourceFileMap, strFilename );
-    if ( pResourceFile )
+    if ( pResourceFile && !pResourceFile->IsModifedByScript() )
     {
+        pResourceFile->SetModifedByScript( true );
         SString strMessage( "Resource file modifed by script: %s ", *ConformResourcePath( strInFilename ) );
         AddReportLog( 7059, strMessage + g_pNet->GetConnectedServer( true ), 10 );
-        MapRemove( m_ResourceFileMap, strFilename );
     }
 }
 
@@ -308,12 +254,12 @@ void CResourceManager::ValidateResourceFile( const SString& strInFilename, const
 {
     SString strFilename = PathConform( strInFilename ).ToLower();
     CDownloadableResource* pResourceFile = MapFindRef( m_ResourceFileMap, strFilename );
-    if ( pResourceFile )
+    if ( pResourceFile && !pResourceFile->IsModifedByScript() )
     {
-        if ( pResourceFile->IsAutoDownload() && !pResourceFile->IsDownloaded() )
+        if ( !pResourceFile->IsAutoDownload() && !pResourceFile->IsDownloaded() )
         {
             // Scripting error
-            g_pClientGame->GetScriptDebugging()->LogError( NULL, "Attempt to load '%s' before onClientFileDownloadComplete event", *ConformResourcePath( strInFilename ) );
+            g_pClientGame->GetScriptDebugging()->LogWarning( NULL, "Attempt to load '%s' before onClientFileDownloadComplete event", *ConformResourcePath( strInFilename ) );
         }
         else
         {
@@ -331,17 +277,17 @@ void CResourceManager::ValidateResourceFile( const SString& strInFilename, const
                     char szMd5Wanted[33];
                     CMD5Hasher::ConvertToHex( pResourceFile->GetServerChecksum().md5, szMd5Wanted );
                     SString strMessage( "Resource file checksum failed: %s [Size:%d MD5:%s][Wanted:%s][datasize:%d] ", *ConformResourcePath( strInFilename ), (int)FileSize( strInFilename ), szMd5, szMd5Wanted, fileData.GetSize() );
-                    g_pClientGame->TellServerSomethingImportant( 1007, strMessage, false );
+                    g_pClientGame->TellServerSomethingImportant( 1007, strMessage );
                     g_pCore->GetConsole ()->Print( strMessage );
                     AddReportLog( 7057, strMessage + g_pNet->GetConnectedServer( true ), 10 );
                 }
                 else
-                if ( !pResourceFile->IsAutoDownload() )
+                if ( pResourceFile->IsAutoDownload() )
                 {
                     char szMd5[33];
                     CMD5Hasher::ConvertToHex( checksum.md5, szMd5 );
                     SString strMessage( "Attempt to load resource file before it is ready: %s [Size:%d MD5:%s] ", *ConformResourcePath( strInFilename ), (int)FileSize( strInFilename ), szMd5 );
-                    g_pClientGame->TellServerSomethingImportant( 1008, strMessage, false );
+                    g_pClientGame->TellServerSomethingImportant( 1008, strMessage );
                     g_pCore->GetConsole ()->Print( strMessage );
                     AddReportLog( 7058, strMessage + g_pNet->GetConnectedServer( true ), 10 );
                 }

@@ -191,15 +191,18 @@ void CResourceChecker::CheckPngFileForIssues ( const string& strPath, const stri
     if ( FILE* pFile = fopen ( strPath.c_str (), "rb" ) )
     {
         // This is what the png header should look like
-        unsigned char pGoodHeader [8] = { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
+        unsigned char pGoodHeaderPng [8] = { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
+        // Also allow jpg header as the client will load misnamed png files
+        unsigned char pGoodHeaderJpg [3] = { 0xFF, 0xD8, 0xFF };
 
-            // Load the header
+        // Load the header
         unsigned char pBuffer [8] = { 0,0,0,0,0,0,0,0 };
         fread ( pBuffer, 1, 8, pFile );
 
         // Check header integrity
-        if ( memcmp ( pBuffer, pGoodHeader, 8 ) )
-            bIsBad = true;
+        if ( memcmp ( pBuffer, pGoodHeaderPng, 8 ) )
+            if ( memcmp ( pBuffer, pGoodHeaderJpg, 3 ) )
+                bIsBad = true;
 
         // Close the file
         fclose ( pFile );
@@ -256,7 +259,7 @@ void CResourceChecker::CheckRwFileForIssues ( const string& strPath, const strin
 
     if ( bIsBad )
     {
-        CLogger::LogPrintf ( "WARNING: File '%s' in resource '%s' is invalid.\n", strFileName.c_str () , strResourceName.c_str () );
+        CLogger::LogPrintf ( "WARNING: File '%s' in resource '%s' contains errors.\n", strFileName.c_str () , strResourceName.c_str () );
     }
 }
 
@@ -400,8 +403,8 @@ void CResourceChecker::CheckLuaFileForIssues ( const string& strPath, const stri
     if ( strFileContents.length () == 0 )
         return;
 
-    // Update decrypt version requirements, and do no more checking if encrypted
-    if ( CheckLuaDecryptRequirements( strFileContents, strFileName, strResourceName, bClientScript ) )
+    // Update deobfuscate version requirements, and do no more checking if obfuscated
+    if ( CheckLuaDeobfuscateRequirements( strFileContents, strFileName, strResourceName, bClientScript ) )
         return;
 
     // Check if a compiled script
@@ -446,12 +449,12 @@ void CResourceChecker::CheckLuaFileForIssues ( const string& strPath, const stri
 
 ///////////////////////////////////////////////////////////////
 //
-// CResourceChecker::CheckLuaDecryptRequirements
+// CResourceChecker::CheckLuaDeobfuscateRequirements
 //
-// Updates version requirements and returns true if encrypted
+// Updates version requirements and returns true if obfuscated
 //
 ///////////////////////////////////////////////////////////////
-bool CResourceChecker::CheckLuaDecryptRequirements ( const string& strFileContents, const string& strFileName, const string& strResourceName, bool bClientScript )
+bool CResourceChecker::CheckLuaDeobfuscateRequirements ( const string& strFileContents, const string& strFileName, const string& strResourceName, bool bClientScript )
 {
     // Get embedded version requirements
     SScriptInfo scriptInfo;
@@ -495,7 +498,7 @@ bool CResourceChecker::CheckLuaDecryptRequirements ( const string& strFileConten
         m_strReqServerReason = strFileName;
     }
 
-    return IsLuaEncryptedScript( strFileContents.c_str(), strFileContents.length() );
+    return IsLuaObfuscatedScript( strFileContents.c_str(), strFileContents.length() );
 }
 
 

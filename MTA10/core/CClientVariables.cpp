@@ -25,7 +25,7 @@ CClientVariables::CClientVariables ( void )
 
 CClientVariables::~CClientVariables ( void )
 {
-    
+
 }
 
 bool CClientVariables::Load ( void )
@@ -254,7 +254,7 @@ void CClientVariables::LoadDefaults ( void )
                                 Set(__x,__y)
     #define _S(__x)             std::string(__x)
 
-    if(!Exists("nick")) 
+    if(!Exists("nick"))
     {
         DEFAULT ( "nick",                       _S(CNickGen::GetRandomNickname()) );       // nickname
         CCore::GetSingleton ().RequestNewNickOnStart();  // Request the user to set a new nickname
@@ -286,6 +286,7 @@ void CClientVariables::LoadDefaults ( void )
     DEFAULT ( "chat_line_fade_out",         3000 );                         // chatbox line fade out time
     DEFAULT ( "chat_use_cegui",             false );                        // chatbox uses cegui
     DEFAULT ( "chat_nickcompletion",        true );                         // chatbox nick completion
+    DEFAULT ( "server_can_flash_window",    true );                         // allow server to flash the window
     DEFAULT ( "text_scale",                 1.0f );                         // text scale
     DEFAULT ( "invert_mouse",               false );                        // mouse inverting
     DEFAULT ( "fly_with_mouse",             false );                        // flying with mouse controls
@@ -325,11 +326,20 @@ void CClientVariables::LoadDefaults ( void )
     DEFAULT ( "browser_remote_websites",    true );                         // Load remote websites?
     DEFAULT ( "browser_remote_javascript",  true );                         // Execute javascript on remote websites?
     DEFAULT ( "browser_plugins",            false );                         // Enable browser plugins?
+    DEFAULT ( "filter_duplicate_log_lines", true );                         // Filter duplicate log lines for debug view and clientscript.log
 
-    if(!Exists("locale")) 
+    if (!Exists("locale"))
     {
         SString strLangCode = GetApplicationSetting ( "locale" );
         Set ( "locale", !strLangCode.empty() ? strLangCode : _S("en_US") );
+    }
+
+    // Set default resolution to native resolution
+    if ( !Exists ( "display_resolution" ) )
+    {
+        RECT rect;
+        GetWindowRect( GetDesktopWindow (), &rect );
+        Set ( "display_resolution", SString ( "%dx%dx32", rect.right, rect.bottom ) );
     }
 
     // We will default this one at CClientGame.cpp, because we need a valid direct3d device to give a proper default value.

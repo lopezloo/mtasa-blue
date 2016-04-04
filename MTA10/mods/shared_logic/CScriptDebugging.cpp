@@ -31,18 +31,22 @@ CScriptDebugging::CScriptDebugging ( CLuaManager* pLuaManager )
 
 CScriptDebugging::~CScriptDebugging ( void )
 {
+    // Flush any pending duplicate loggings
+    m_DuplicateLineFilter.Flush();
+    UpdateLogOutput();
+
     // Close the previously loaded file
     if ( m_pLogFile )
     {
         fprintf ( m_pLogFile, "INFO: Logging to this file ended\n" );
-        fclose ( m_pLogFile );
 
         // if we have a flush timer
         if ( m_flushTimerHandle != NULL )
         {
             // delete our flush timer
-            DeleteTimerQueueTimer ( NULL, m_flushTimerHandle, NULL );
+            DeleteTimerQueueTimer ( NULL, m_flushTimerHandle, INVALID_HANDLE_VALUE );   // INVALID_HANDLE_VALUE = wait for running callbacks to finish
         }
+        fclose ( m_pLogFile );
         m_pLogFile = NULL;
     }
 }
@@ -185,8 +189,11 @@ void CScriptDebugging::LogPCallError( lua_State* luaVM, const SString& strRes, b
         // File+line info present
         SString strFile = vecSplit[ 0 ];
         int     iLine   = atoi( vecSplit[ 1 ] );
-        SString strMsg  = vecSplit[2].SubStr( 1 );
-                    
+        
+        // Get the message string (we cannot use vecSplit here as the message itself could contain ':')
+        auto pos = strRes.find ( ':', vecSplit[0].length () + vecSplit[1].length () ) ;
+        SString strMsg = strRes.SubStr ( pos+2 );
+        
         if ( iLine == 0 && bInitialCall )
         {
             // Location hint for compiled scripts
@@ -222,13 +229,13 @@ bool CScriptDebugging::SetLogfile ( const char* szFilename, unsigned int uiLevel
     if ( m_pLogFile )
     {
         fprintf ( m_pLogFile, "INFO: Logging to this file ended\n" );
-        fclose ( m_pLogFile );
         // if we have a flush timer
         if ( m_flushTimerHandle != NULL )
         {
             // delete our flush timer
-            DeleteTimerQueueTimer ( NULL, m_flushTimerHandle, NULL );
+            DeleteTimerQueueTimer ( NULL, m_flushTimerHandle, INVALID_HANDLE_VALUE );   // INVALID_HANDLE_VALUE = wait for running callbacks to finish
         }
+        fclose ( m_pLogFile );
         m_pLogFile = NULL;
     }
 
@@ -400,11 +407,6 @@ void CScriptDebugging::LogString ( const char* szPrePend, const SLuaDebugInfo& l
         m_bTriggeringOnClientDebugMessage = false;
     }
 
-    // Log it to the file if enough level
-    if ( m_uiLogFileLevel >= uiMinimumDebugLevel )
-    {
-        PrintLog ( strText );
-    }
     switch ( uiMinimumDebugLevel )
     {
         case 1:
@@ -417,10 +419,29 @@ void CScriptDebugging::LogString ( const char* szPrePend, const SLuaDebugInfo& l
             ucRed = 0, ucGreen = 255, ucBlue = 0;
             break;
     }
-#ifdef MTA_DEBUG
-    if ( !g_pCore->IsDebugVisible () ) return;
-#endif
-    g_pCore->DebugEchoColor ( strText, ucRed, ucGreen, ucBlue );
+
+    m_DuplicateLineFilter.AddLine( { strText, uiMinimumDebugLevel, ucRed, ucGreen, ucBlue } );
+    if ( g_pCore->GetCVars ()->GetValue < bool > ( "filter_duplicate_log_lines" ) == false )
+        m_DuplicateLineFilter.Flush();
+    UpdateLogOutput();
+}
+
+
+void CScriptDebugging::UpdateLogOutput( void )
+{
+    SLogLine line;
+    while( m_DuplicateLineFilter.PopOutputLine( line ) )
+    {
+        // Log it to the file if enough level
+        if ( m_uiLogFileLevel >= line.uiMinimumDebugLevel )
+        {
+            PrintLog ( line.strText );
+        }
+    #ifdef MTA_DEBUG
+        if ( !g_pCore->IsDebugVisible () ) return;
+    #endif
+        g_pCore->DebugEchoColor ( line.strText, line.ucRed, line.ucGreen, line.ucBlue );
+    }
 }
 
 

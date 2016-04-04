@@ -24,9 +24,6 @@ class CRegisteredCommands;
 class CLuaOOPDefs : public CLuaDefs
 {
 public:
-    // Ped
-    LUA_DECLARE ( SetPedOccupiedVehicle );
-
     // Element
     LUA_DECLARE ( GetElementMatrix );
     LUA_DECLARE ( GetElementPosition );
@@ -40,12 +37,6 @@ public:
     LUA_DECLARE ( SetCameraPosition );
     LUA_DECLARE ( GetCameraRotation );
     LUA_DECLARE ( SetCameraRotation );
-
-    // Vehicle
-    LUA_DECLARE ( GetVehicleGravity );
-
-    // Marker
-    LUA_DECLARE ( GetMarkerTarget );
 
     // Drawing
     LUA_DECLARE ( DxGetFontHeight );

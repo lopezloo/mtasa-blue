@@ -51,7 +51,6 @@ void CWebView::Initialise ()
     CefBrowserSettings browserSettings;
     browserSettings.windowless_frame_rate = g_pCore->GetFrameRateLimit ();
     browserSettings.javascript_access_clipboard = cef_state_t::STATE_DISABLED;
-    browserSettings.java = cef_state_t::STATE_DISABLED;
     browserSettings.caret_browsing = cef_state_t::STATE_ENABLED;
     browserSettings.universal_access_from_file_urls = cef_state_t::STATE_DISABLED; // Also filtered by resource interceptor, but set this nevertheless
     browserSettings.file_access_from_file_urls = cef_state_t::STATE_DISABLED;
@@ -373,6 +372,61 @@ bool CWebView::VerifyFile ( const SString& strPath )
     return m_pEventsInterface->Events_OnResourceFileCheck ( strPath );
 }
 
+bool CWebView::CanGoBack ()
+{
+    if ( !m_pWebView )
+        return false;
+
+    return m_pWebView->CanGoBack ();
+}
+
+bool CWebView::CanGoForward ()
+{
+    if ( !m_pWebView )
+        return false;
+
+    return m_pWebView->CanGoForward ();
+}
+
+bool CWebView::GoBack ()
+{
+    if ( !m_pWebView )
+        return false;
+
+    if ( !m_pWebView->CanGoBack () )
+        return false;
+
+    m_pWebView->GoBack ();
+    return true;
+}
+
+bool CWebView::GoForward ()
+{
+    if ( !m_pWebView )
+        return false;
+
+    if ( !m_pWebView->CanGoForward () )
+        return false;
+
+    m_pWebView->GoForward ();
+    return true;
+}
+
+void CWebView::Refresh ( bool bIgnoreCache )
+{
+    if ( !m_pWebView )
+        return;
+
+    if ( bIgnoreCache )
+    {
+        m_pWebView->ReloadIgnoreCache ();
+    }
+    else
+    {
+        m_pWebView->Reload ();
+    }
+}
+
 ////////////////////////////////////////////////////////////////////
 //                                                                //
 // Implementation: CefClient::OnProcessMessageReceived            //
@@ -644,9 +698,12 @@ bool CWebView::OnBeforeBrowse ( CefRefPtr<CefBrowser> browser, CefRefPtr<CefFram
         bResult = false; // Allow mtalocal:// URLs
     else
         bResult = true; // Block other schemes
-    
+
+    // Check if we're in the browser's main frame or only a frame element of the current page
+    bool bIsMainFrame = frame->IsMain ();
+
     // Queue event to run on the main thread
-    auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnNavigate, m_pEventsInterface, SString ( request->GetURL () ), bResult );
+    auto func = std::bind ( &CWebBrowserEventsInterface::Events_OnNavigate, m_pEventsInterface, SString ( request->GetURL () ), bResult, bIsMainFrame );
     g_pCore->GetWebCore ()->AddEventToEventQueue ( func, this, "OnNavigate" );
 
     // Return execution to CEF

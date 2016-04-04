@@ -150,6 +150,7 @@ namespace SharedUtil
     bool            IsWindowsVersionOrGreater       ( WORD wMajorVersion, WORD wMinorVersion, WORD wServicePackMajor );
     bool            IsWindowsXPSP3OrGreater         ( void );
     bool            IsWindowsVistaOrGreater         ( void );
+    bool            IsWindows7OrGreater             ( void );
     bool            IsWindows8OrGreater             ( void );
 
 #endif
@@ -216,7 +217,7 @@ namespace SharedUtil
 
     // Buffer identification
     bool IsLuaCompiledScript( const void* pData, uint uiLength );
-    bool IsLuaEncryptedScript( const void* pData, uint uiLength );
+    bool IsLuaObfuscatedScript( const void* pData, uint uiLength );
 
     //
     // Some templates

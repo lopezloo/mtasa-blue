@@ -55,10 +55,16 @@ void CClientPointLightsManager::DeleteAll ( void )
     {
         delete *iter;
     }
+
+    for ( auto pLight : m_SearchLightList )
+    {
+        delete pLight;
+    }
     m_bDontRemoveFromList = false;
 
     // Clear the list
     m_List.clear ();
+    m_SearchLightList.clear ();
 }
 
 CClientPointLights* CClientPointLightsManager::Get ( ElementID ID )
@@ -96,10 +102,40 @@ void CClientPointLightsManager::DoPulse ( void )
     }
 }
 
+void CClientPointLightsManager::RenderHeliLightHandler ()
+{
+    // Set render states
+    auto pLights = g_pGame->GetPointLights ();
+    pLights->PreRenderHeliLights ();
+
+    // Render our lights
+    for ( auto pLight : m_SearchLightList )
+    {
+        pLight->Render ();
+    }
+
+    // Reset render states
+    pLights->PostRenderHeliLights ();
+}
+
+bool CClientPointLightsManager::IsLightsLimitReached ()
+{
+    auto pThis = g_pClientGame->GetManager ()->GetPointLightsManager ();
+    return pThis->m_SearchLightList.size () >= 1000;
+}
+
 void CClientPointLightsManager::RemoveFromList ( CClientPointLights* pLight )
 {
     if ( !m_bDontRemoveFromList )
     {
         if ( !m_List.empty() ) m_List.remove ( pLight );
+    }
+}
+
+void CClientPointLightsManager::RemoveSearchLightFromList ( CClientSearchLight* pLight )
+{
+    if ( !m_bDontRemoveFromList )
+    {
+        m_SearchLightList.remove ( pLight );
     }
 }

@@ -98,6 +98,7 @@
       <TreatWarningAsError>false</TreatWarningAsError>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <DisableSpecificWarnings>4290;4996;4482;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <AdditionalOptions>/Zm110 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <RegisterOutput>false</RegisterOutput>
@@ -136,6 +137,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <DisableSpecificWarnings>4996;4482;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <AdditionalOptions>/Zm110 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
@@ -177,6 +179,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <DisableSpecificWarnings>4996;4482;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <AdditionalOptions>/Zm110 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <ProjectReference>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
@@ -359,22 +362,31 @@
     </ClCompile>
     <ClCompile Include="..\shared_logic\CClientEffect.cpp" />
     <ClCompile Include="..\shared_logic\CClientEffectManager.cpp" />
+    <ClCompile Include="..\shared_logic\CClientSearchLight.cpp" />
     <ClCompile Include="..\shared_logic\CClientPointLights.cpp" />
     <ClCompile Include="..\shared_logic\CClientPointLightsManager.cpp" />
     <ClCompile Include="..\shared_logic\CClientRope.cpp" />
     <ClCompile Include="..\shared_logic\CClientRopeManager.cpp" />
+    <ClCompile Include="..\shared_logic\luadefs\CLuaAudioDefs.cpp" />
+    <ClCompile Include="..\shared_logic\luadefs\CLuaBitDefs.cpp" />
+    <ClCompile Include="..\shared_logic\luadefs\CLuaBlipDefs.cpp" />
+    <ClCompile Include="..\shared_logic\luadefs\CLuaBrowserDefs.cpp" />
+    <ClCompile Include="..\shared_logic\luadefs\CLuaMarkerDefs.cpp" />
+    <ClCompile Include="..\shared_logic\luadefs\CLuaObjectDefs.cpp" />
+    <ClCompile Include="..\shared_logic\luadefs\CLuaPlayerDefs.cpp" />
+    <ClCompile Include="..\shared_logic\luadefs\CLuaPointLightDefs.cpp" />
+    <ClCompile Include="..\shared_logic\luadefs\CLuaPedDefs.cpp" />
+    <ClCompile Include="..\shared_logic\luadefs\CLuaSearchLightDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaVector2Defs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaVector3Defs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaVector4Defs.cpp" />
-    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.PointLights.cpp" />
+    <ClCompile Include="..\shared_logic\luadefs\CLuaVehicleDefs.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaVector2.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaVector3.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaVector4.cpp" />
     <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Drawing.cpp" />
-    <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Marker.cpp" />
     <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.RadarArea.cpp" />
     <ClCompile Include="..\shared_logic\CClientWebBrowser.cpp" />
-    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Browser.cpp" />
     <ClCompile Include="CClient.cpp" />
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="ClientCommands.cpp" />
@@ -426,6 +438,7 @@
     <ClCompile Include="..\shared_logic\CRemoteCalls.cpp" />
     <ClCompile Include="logic\CResource.cpp" />
     <ClCompile Include="logic\CResourceConfigItem.cpp" />
+    <ClCompile Include="logic\CResourceFileDownloadManager.cpp" />
     <ClCompile Include="logic\CResourceManager.cpp" />
     <ClCompile Include="logic\CScriptKeyBinds.cpp" />
     <ClCompile Include="logic\CServer.cpp" />
@@ -556,9 +569,6 @@
     <ClCompile Include="..\shared_logic\lua\CLuaArgument.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaArguments.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaCFunctions.cpp" />
-    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Audio.cpp" />
-    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Bit.cpp" />
-    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Blip.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.BodyClothes.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Camera.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Commands.cpp" />
@@ -569,19 +579,14 @@
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Event.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.GUI.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Input.cpp" />
-    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Marker.cpp" />
-    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Object.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Output.cpp" />
-    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Ped.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Pickup.cpp" />
-    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Player.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Projectile.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Radar.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Resource.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Shape.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Team.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Util.cpp" />
-    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Vehicle.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Voice.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Weapon.cpp" />
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.World.cpp" />
@@ -596,8 +601,6 @@
     <ClCompile Include="..\shared_logic\lua\LuaCommon.cpp" />
     <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Camera.cpp" />
     <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Element.cpp" />
-    <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Ped.cpp" />
-    <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Vehicle.cpp" />
     <ClCompile Include="..\..\..\vendor\bochs\bochs_internal\crc32.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaClassDefs.cpp" />
     <ClCompile Include="..\shared_logic\luadefs\CLuaDefs.cpp" />
@@ -756,13 +759,25 @@
   <ItemGroup>
     <ClInclude Include="..\shared_logic\CClientEffect.h" />
     <ClInclude Include="..\shared_logic\CClientEffectManager.h" />
+    <ClInclude Include="..\shared_logic\CClientSearchLight.h" />
     <ClInclude Include="..\shared_logic\CClientPointLights.h" />
     <ClInclude Include="..\shared_logic\CClientPointLightsManager.h" />
     <ClInclude Include="..\shared_logic\CClientRope.h" />
     <ClInclude Include="..\shared_logic\CClientRopeManager.h" />
+    <ClInclude Include="..\shared_logic\luadefs\CLuaAudioDefs.h" />
+    <ClInclude Include="..\shared_logic\luadefs\CLuaBitDefs.h" />
+    <ClInclude Include="..\shared_logic\luadefs\CLuaBlipDefs.h" />
+    <ClInclude Include="..\shared_logic\luadefs\CLuaBrowserDefs.h" />
+    <ClInclude Include="..\shared_logic\luadefs\CLuaMarkerDefs.h" />
+    <ClInclude Include="..\shared_logic\luadefs\CLuaObjectDefs.h" />
+    <ClInclude Include="..\shared_logic\luadefs\CLuaPlayerDefs.h" />
+    <ClInclude Include="..\shared_logic\luadefs\CLuaPointLightDefs.h" />
+    <ClInclude Include="..\shared_logic\luadefs\CLuaPedDefs.h" />
+    <ClInclude Include="..\shared_logic\luadefs\CLuaSearchLightDefs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaVector2Defs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaVector3Defs.h" />
     <ClInclude Include="..\shared_logic\luadefs\CLuaVector4Defs.h" />
+    <ClInclude Include="..\shared_logic\luadefs\CLuaVehicleDefs.h" />
     <ClInclude Include="..\shared_logic\lua\CLuaVector2.h" />
     <ClInclude Include="..\shared_logic\lua\CLuaVector3.h" />
     <ClInclude Include="..\shared_logic\lua\CLuaVector4.h" />
@@ -803,6 +818,7 @@
     <ClInclude Include="logic\CResource.h" />
     <ClInclude Include="logic\CResourceConfigItem.h" />
     <ClInclude Include="logic\CResourceFile.h" />
+    <ClInclude Include="logic\CResourceFileDownloadManager.h" />
     <ClInclude Include="logic\CResourceManager.h" />
     <ClInclude Include="logic\CScriptKeyBinds.h" />
     <ClInclude Include="logic\CServer.h" />

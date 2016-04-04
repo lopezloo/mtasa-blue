@@ -1,4 +1,4 @@
-Multi Theft Auto: San Andreas 
+Multi Theft Auto: San Andreas
 -----------------------------
 
 [Multi Theft Auto](https://www.multitheftauto.com/) (MTA) is a software project that adds network play functionality to Rockstar North's Grand Theft Auto game series, in which this functionality is not originally found. It is a unique modification that incorporates an extendable network play element into a proprietary commercial single-player PC game.
@@ -30,16 +30,11 @@ Our project's code repository can be found on the [multitheftauto/mtasa-blue](ht
 * [Bugtracker Roadmap](https://bugs.mtasa.com/roadmap_page.php)
 * [Wiki Roadmap](https://wiki.mtasa.com/wiki/Roadmap)
 
-### Screenshots
-
-![screenshot 1](http://www.mtasa.com/images/c_wipeout.png "Screenshot 1")
-![screenshot 2](http://www.mtasa.com/images/c_bigpeds.png "Screenshot 2")
-![screenshot 3](http://www.mtasa.com/images/c_yougofirst.png "Screenshot 3")
-
-For in-game videos, head over to [MTAQA on YouTube](https://www.youtube.com/user/MTAQA).
+#### IDE Setup
+Download and install the [EditorConfig](https://visualstudiogallery.msdn.microsoft.com/c8bccfe2-650c-4b42-bc5c-845e21f96328) to automatically set up your IDE for the correct formatting.
 
 ### License
 
 Unless otherwise specified, all source code hosted on this repository is licensed under the GPLv3 license. See the LICENSE file for more details.
 
-Grand Theft Auto and all related trademarks are © Rockstar North 1997-2009.
+Grand Theft Auto and all related trademarks are © Rockstar North 1997-2015.

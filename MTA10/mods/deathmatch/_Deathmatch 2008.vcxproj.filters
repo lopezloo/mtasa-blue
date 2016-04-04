@@ -188,6 +188,9 @@
     <ClCompile Include="logic\CResourceManager.cpp">
       <Filter>Source Files\logic</Filter>
     </ClCompile>
+    <ClCompile Include="logic\CResourceFileDownloadManager.cpp">
+      <Filter>Source Files\logic</Filter>
+    </ClCompile>
     <ClCompile Include="logic\CScriptKeyBinds.cpp">
       <Filter>Source Files\logic</Filter>
     </ClCompile>
@@ -563,15 +566,6 @@
     <ClCompile Include="..\shared_logic\lua\CLuaCFunctions.cpp">
       <Filter>Source Files\shared_logic\lua</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Audio.cpp">
-      <Filter>Source Files\shared_logic\lua</Filter>
-    </ClCompile>
-    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Bit.cpp">
-      <Filter>Source Files\shared_logic\lua</Filter>
-    </ClCompile>
-    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Blip.cpp">
-      <Filter>Source Files\shared_logic\lua</Filter>
-    </ClCompile>
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.BodyClothes.cpp">
       <Filter>Source Files\shared_logic\lua</Filter>
     </ClCompile>
@@ -602,22 +596,10 @@
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Input.cpp">
       <Filter>Source Files\shared_logic\lua</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Marker.cpp">
-      <Filter>Source Files\shared_logic\lua</Filter>
-    </ClCompile>
-    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Object.cpp">
-      <Filter>Source Files\shared_logic\lua</Filter>
-    </ClCompile>
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Output.cpp">
       <Filter>Source Files\shared_logic\lua</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Ped.cpp">
-      <Filter>Source Files\shared_logic\lua</Filter>
-    </ClCompile>
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Pickup.cpp">
-      <Filter>Source Files\shared_logic\lua</Filter>
-    </ClCompile>
-    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Player.cpp">
       <Filter>Source Files\shared_logic\lua</Filter>
     </ClCompile>
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Projectile.cpp">
@@ -636,9 +618,6 @@
       <Filter>Source Files\shared_logic\lua</Filter>
     </ClCompile>
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Util.cpp">
-      <Filter>Source Files\shared_logic\lua</Filter>
-    </ClCompile>
-    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Vehicle.cpp">
       <Filter>Source Files\shared_logic\lua</Filter>
     </ClCompile>
     <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Voice.cpp">
@@ -681,12 +660,6 @@
       <Filter>Source Files\shared_logic\lua\oopdefs</Filter>
     </ClCompile>
     <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Element.cpp">
-      <Filter>Source Files\shared_logic\lua\oopdefs</Filter>
-    </ClCompile>
-    <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Ped.cpp">
-      <Filter>Source Files\shared_logic\lua\oopdefs</Filter>
-    </ClCompile>
-    <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Vehicle.cpp">
       <Filter>Source Files\shared_logic\lua\oopdefs</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\vendor\bochs\bochs_internal\crc32.cpp">
@@ -818,9 +791,6 @@
     <ClCompile Include="..\shared_logic\lua\CLuaVector2.cpp">
       <Filter>Source Files\shared_logic\lua</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Marker.cpp">
-      <Filter>Source Files\shared_logic\lua\oopdefs</Filter>
-    </ClCompile>
     <ClCompile Include="..\shared_logic\lua\oopdefs\CLuaOOPFunctionDefs.Drawing.cpp">
       <Filter>Source Files\shared_logic\lua\oopdefs</Filter>
     </ClCompile>
@@ -926,14 +896,44 @@
     <ClCompile Include="..\shared_logic\CClientPointLightsManager.cpp">
       <Filter>Source Files\shared_logic</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.PointLights.cpp">
-      <Filter>Source Files\shared_logic\lua</Filter>
-    </ClCompile>
     <ClCompile Include="..\shared_logic\CClientWebBrowser.cpp">
       <Filter>Source Files\shared_logic</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared_logic\lua\CLuaFunctionDefs.Browser.cpp">
-      <Filter>Source Files\shared_logic\lua</Filter>
+    <ClCompile Include="..\shared_logic\CClientSearchLight.cpp">
+      <Filter>Source Files\shared_logic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared_logic\luadefs\CLuaSearchLightDefs.cpp">
+      <Filter>Source Files\shared_logic\luadefs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared_logic\luadefs\CLuaPedDefs.cpp">
+      <Filter>Source Files\shared_logic\luadefs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared_logic\luadefs\CLuaBrowserDefs.cpp">
+      <Filter>Source Files\shared_logic\luadefs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared_logic\luadefs\CLuaPointLightDefs.cpp">
+      <Filter>Source Files\shared_logic\luadefs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared_logic\luadefs\CLuaAudioDefs.cpp">
+      <Filter>Source Files\shared_logic\luadefs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared_logic\luadefs\CLuaMarkerDefs.cpp">
+      <Filter>Source Files\shared_logic\luadefs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared_logic\luadefs\CLuaBlipDefs.cpp">
+      <Filter>Source Files\shared_logic\luadefs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared_logic\luadefs\CLuaVehicleDefs.cpp">
+      <Filter>Source Files\shared_logic\luadefs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared_logic\luadefs\CLuaPlayerDefs.cpp">
+      <Filter>Source Files\shared_logic\luadefs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared_logic\luadefs\CLuaBitDefs.cpp">
+      <Filter>Source Files\shared_logic\luadefs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared_logic\luadefs\CLuaObjectDefs.cpp">
+      <Filter>Source Files\shared_logic\luadefs</Filter>
     </ClCompile>
     <ClCompile Include="..\shared_logic\CClientRope.cpp">
       <Filter>Source Files\shared_logic</Filter>
@@ -1052,6 +1052,9 @@
       <Filter>Header Files\logic</Filter>
     </ClInclude>
     <ClInclude Include="logic\CResourceFile.h">
+      <Filter>Header Files\logic</Filter>
+    </ClInclude>
+    <ClInclude Include="logic\CResourceFileDownloadManager.h">
       <Filter>Header Files\logic</Filter>
     </ClInclude>
     <ClInclude Include="logic\CResourceManager.h">
@@ -1665,6 +1668,42 @@
     </ClInclude>
     <ClInclude Include="..\shared_logic\CClientRopeManager.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared_logic\CClientSearchLight.h">
+      <Filter>Header Files\shared_logic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared_logic\luadefs\CLuaSearchLightDefs.h">
+      <Filter>Header Files\shared_logic\luadefs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared_logic\luadefs\CLuaPedDefs.h">
+      <Filter>Header Files\shared_logic\luadefs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared_logic\luadefs\CLuaBrowserDefs.h">
+      <Filter>Header Files\shared_logic\luadefs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared_logic\luadefs\CLuaPointLightDefs.h">
+      <Filter>Header Files\shared_logic\luadefs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared_logic\luadefs\CLuaAudioDefs.h">
+      <Filter>Header Files\shared_logic\luadefs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared_logic\luadefs\CLuaMarkerDefs.h">
+      <Filter>Header Files\shared_logic\luadefs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared_logic\luadefs\CLuaBlipDefs.h">
+      <Filter>Header Files\shared_logic\luadefs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared_logic\luadefs\CLuaVehicleDefs.h">
+      <Filter>Header Files\shared_logic\luadefs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared_logic\luadefs\CLuaPlayerDefs.h">
+      <Filter>Header Files\shared_logic\luadefs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared_logic\luadefs\CLuaBitDefs.h">
+      <Filter>Header Files\shared_logic\luadefs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared_logic\luadefs\CLuaObjectDefs.h">
+      <Filter>Header Files\shared_logic\luadefs</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

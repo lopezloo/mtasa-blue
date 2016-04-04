@@ -55,6 +55,7 @@ public:
     static bool                         ShowChat                            ( bool bShow );
     static bool                         SetClipboard                        ( SString& strText );
     static bool                         GetClipboard                        ( SString& strText );
+    static bool                         SetWindowFlashing                   ( bool flash, uint count );
 
     // Element get funcs
     static CClientEntity*               GetRootElement                      ( void );
@@ -135,6 +136,7 @@ public:
 
     // Ped funcs
     static CClientPed*                  CreatePed                           ( CResource& Resource, unsigned long ulModel, const CVector& vecPosition, float fRotation );
+    static bool                         KillPed                             ( CClientEntity& Entity, CClientEntity* pKiller, unsigned char ucKillerWeapon, unsigned char ucBodyPart, bool bStealth );
 
     static CClientEntity*               GetPedTarget                        ( CClientPed& Ped );
     static bool                         GetPedTargetCollision               ( CClientPed& Ped, CVector& vecOrigin );
@@ -322,6 +324,9 @@ public:
     static bool                         SetLightColor                       ( CClientPointLights* pLight, SColor color );
     static bool                         SetLightDirection                   ( CClientPointLights* pLight, CVector vecDirection );
 
+    // Search light funcs
+    static CClientSearchLight*          CreateSearchLight                   ( CResource& Resource, const CVector& vecStart, const CVector& vecEnd, float startRadius, float endRadius, bool renderSpot );
+    
     // Audio funcs
     static bool                         PlaySoundFrontEnd                   ( unsigned char ucSound );
     static bool                         SetAmbientSoundEnabled              ( eAmbientSoundType eType, bool bMute );

@@ -136,6 +136,31 @@ void CClientWebBrowser::GetSourceCode ( const std::function<void( const std::str
     return m_pWebView->GetSourceCode ( callback );
 }
 
+bool CClientWebBrowser::CanGoBack ()
+{
+    return m_pWebView->CanGoBack ();
+}
+
+bool CClientWebBrowser::CanGoForward ()
+{
+    return m_pWebView->CanGoForward ();
+}
+
+bool CClientWebBrowser::GoBack ()
+{
+    return m_pWebView->GoBack ();
+}
+
+bool CClientWebBrowser::GoForward ()
+{
+    return m_pWebView->GoForward ();
+}
+
+void CClientWebBrowser::Refresh ( bool bIgnoreCache )
+{
+    m_pWebView->Refresh ( bIgnoreCache );
+}
+
 ////////////////////////////////////////////////////////////////////////////
 //                                                                        //
 //            CWebBrowserEventsInterface implementation                   //
@@ -171,11 +196,12 @@ void CClientWebBrowser::Events_OnLoadingFailed ( const SString& strURL, int erro
     CallEvent ( "onClientBrowserLoadingFailed", Arguments, false );
 }
 
-void CClientWebBrowser::Events_OnNavigate ( const SString& strURL, bool bIsBlocked )
+void CClientWebBrowser::Events_OnNavigate ( const SString& strURL, bool bIsBlocked, bool bIsMainFrame )
 {
     CLuaArguments Arguments;
     Arguments.PushString ( strURL );
     Arguments.PushBoolean ( bIsBlocked );
+    Arguments.PushBoolean ( bIsMainFrame );
     CallEvent ( "onClientBrowserNavigate", Arguments, false );
 }
 
@@ -298,7 +324,6 @@ bool CClientWebBrowser::ToggleDevTools ( bool visible )
 {
     return m_pWebView->ToggleDevTools ( visible );
 }
-
 
 CClientGUIWebBrowser::CClientGUIWebBrowser ( bool isLocal, bool isTransparent, uint width, uint height, CClientManager* pManager, CLuaMain* pLuaMain, CGUIElement* pCGUIElement, ElementID ID ) 
     : CClientGUIElement ( pManager, pLuaMain, pCGUIElement, ID )

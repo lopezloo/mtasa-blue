@@ -352,18 +352,15 @@ typedef WINBASEAPI BOOL (WINAPI *LPFN_QueryFullProcessImageNameW)(__in HANDLE hP
 
 ///////////////////////////////////////////////////////////////////////////
 //
-// GetPossibleProcessPathFilenames
+// GetProcessPathFilename
 //
-// Get all image names for a processID
+//
 //
 ///////////////////////////////////////////////////////////////////////////
-std::vector < SString > GetPossibleProcessPathFilenames ( DWORD processID )
+SString GetProcessPathFilename ( DWORD processID )
 {
     static LPFN_QueryFullProcessImageNameW fnQueryFullProcessImageNameW = NULL;
     static bool bDoneGetProcAddress = false;
-
-    std::vector < SString > result;
-
     if ( !bDoneGetProcAddress )
     {
         // Find 'QueryFullProcessImageNameA'
@@ -377,50 +374,64 @@ std::vector < SString > GetPossibleProcessPathFilenames ( DWORD processID )
         for ( int i = 0 ; i < 2 ; i++ )
         {
             HANDLE hProcess = OpenProcess ( i == 0 ? PROCESS_QUERY_INFORMATION : PROCESS_QUERY_LIMITED_INFORMATION, FALSE, processID );
-
             if ( hProcess )
             {
                 WCHAR szProcessName[MAX_PATH] = L"";
                 DWORD dwSize = NUMELMS(szProcessName);
                 DWORD bOk = fnQueryFullProcessImageNameW ( hProcess, 0, szProcessName, &dwSize );
                 CloseHandle( hProcess );
-
-                if ( bOk && wcslen ( szProcessName ) > 0 )
-                    ListAddUnique ( result, ToUTF8 ( szProcessName ) );
+                if ( bOk )
+                {
+                    wchar_t szBuffer[MAX_PATH * 2] = L"";
+                    if ( GetLongPathNameW( szProcessName, szBuffer, NUMELMS(szBuffer) - 1 ) )
+                    {
+                        return ToUTF8( szBuffer );
+                    }
+                }
             }
         }
     }
 
     {
-        HANDLE hProcess = OpenProcess( PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, processID );
-
-        if ( hProcess )
         {
-            WCHAR szProcessName[MAX_PATH] = L"";
-            DWORD bOk = GetModuleFileNameExW ( hProcess, NULL, szProcessName, NUMELMS(szProcessName) );
-            CloseHandle ( hProcess );
+            HANDLE hProcess = OpenProcess( PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, processID );
+            if ( hProcess )
+            {
+                WCHAR szProcessName[MAX_PATH] = L"";
+                DWORD bOk = GetModuleFileNameExW( hProcess, NULL, szProcessName, NUMELMS(szProcessName) );
+                CloseHandle( hProcess );
+                if ( bOk )
+                {
+                    wchar_t szBuffer[MAX_PATH * 2] = L"";
+                    if ( GetLongPathNameW( szProcessName, szBuffer, NUMELMS(szBuffer) - 1 ) )
+                    {
+                        return ToUTF8( szBuffer );
+                    }
+                }
+            }
+        }
 
-            if ( bOk && wcslen ( szProcessName ) > 0 )
-                ListAddUnique ( result, ToUTF8 ( szProcessName ) );
+        for ( int i = 0 ; i < 2 ; i++ )
+        {
+            HANDLE hProcess = OpenProcess( i == 0 ? PROCESS_QUERY_INFORMATION : PROCESS_QUERY_LIMITED_INFORMATION, FALSE, processID );
+            if ( hProcess )
+            {
+                WCHAR szProcessName[MAX_PATH] = L"";
+                DWORD bOk = GetProcessImageFileNameW( hProcess, szProcessName, NUMELMS(szProcessName) );
+                CloseHandle( hProcess );
+                if ( bOk )
+                {
+                    wchar_t szBuffer[MAX_PATH * 2] = L"";
+                    if ( GetLongPathNameW( devicePathToWin32Path( szProcessName ), szBuffer, NUMELMS(szBuffer) - 1 ) )
+                    {
+                        return ToUTF8( szBuffer );
+                    }
+                }
+            }
         }
     }
 
-    for ( int i = 0 ; i < 2 ; i++ )
-    {
-        HANDLE hProcess = OpenProcess ( i == 0 ? PROCESS_QUERY_INFORMATION : PROCESS_QUERY_LIMITED_INFORMATION, FALSE, processID );
-
-        if ( hProcess )
-        {
-            WCHAR szProcessName[MAX_PATH] = L"";
-            DWORD bOk = GetProcessImageFileNameW ( hProcess, szProcessName, NUMELMS(szProcessName) );
-            CloseHandle( hProcess );
-
-            if ( bOk && wcslen ( szProcessName ) > 0 )
-                ListAddUnique ( result, ToUTF8 ( devicePathToWin32Path ( szProcessName ) ) );
-        }
-    }
-
-    return result;
+    return "";
 }
 
 
@@ -431,7 +442,7 @@ std::vector < SString > GetPossibleProcessPathFilenames ( DWORD processID )
 //
 //
 ///////////////////////////////////////////////////////////////////////////
-std::vector < DWORD > MyEnumProcesses ( void )
+std::vector < DWORD > MyEnumProcesses ( bool bInclude64bit, bool bIncludeCurrent )
 {
     uint uiSize = 200;
     std::vector < DWORD > processIdList;
@@ -455,7 +466,18 @@ std::vector < DWORD > MyEnumProcesses ( void )
         uiSize *= 2;
     }
 
-    return processIdList;
+    // Filter list
+    std::vector < DWORD > filteredList;
+    for( auto processId : processIdList )
+    {
+        if ( !bInclude64bit && !Is32bitProcess ( processId ) )
+            continue;
+        if ( !bIncludeCurrent && processId == GetCurrentProcessId() )
+            continue;
+        filteredList.push_back( processId );
+    }
+
+    return filteredList;
 }
 
 
@@ -502,18 +524,11 @@ std::vector < DWORD > GetGTAProcessList ( void )
 {
     std::vector < DWORD > result;
 
-    std::vector < DWORD > processIdList = MyEnumProcesses ();
-    for ( uint i = 0; i < processIdList.size (); i++ )
+    for ( auto processId : MyEnumProcesses() )
     {
-        DWORD processId = processIdList[i];
-        // Skip 64 bit processes to avoid errors
-        if ( !Is32bitProcess ( processId ) )
-            continue;
-
-        std::vector < SString > filenameList = GetPossibleProcessPathFilenames ( processId );
-        for ( uint i = 0; i < filenameList.size (); i++ )
-            if ( filenameList[i].EndsWith ( MTA_GTAEXE_NAME ) || filenameList[i].EndsWith ( MTA_HTAEXE_NAME ) )
-                ListAddUnique ( result, processId );
+        SString strPathFilename = GetProcessPathFilename ( processId );
+        if ( strPathFilename.EndsWith ( MTA_GTAEXE_NAME ) || strPathFilename.EndsWith ( MTA_HTAEXE_NAME ) )
+            ListAddUnique ( result, processId );
     }
 
     if ( DWORD processId = FindProcessId ( MTA_GTAEXE_NAME ) )
@@ -550,23 +565,15 @@ void TerminateGTAIfRunning ( void )
 {
     std::vector < DWORD > processIdList = GetGTAProcessList ();
 
-    if ( processIdList.size () )
+    // Try to stop all GTA process id's
+    for ( uint i = 0 ; i < 3 && processIdList.size () ; i++ )
     {
-        // Try to stop all GTA process id's
-        for ( uint i = 0 ; i < 3 && processIdList.size () ; i++ )
+        for ( auto processId : processIdList )
         {
-            for ( std::vector < DWORD > ::iterator iter = processIdList.begin () ; iter != processIdList.end (); ++iter )
-            {
-                HANDLE hProcess = OpenProcess ( PROCESS_TERMINATE, 0, *iter );
-                if ( hProcess )
-                {
-                    TerminateProcess ( hProcess, 0 );
-                    CloseHandle ( hProcess );
-                }
-            }
-            Sleep ( 1000 );
-            processIdList = GetGTAProcessList ();
+            TerminateProcess( processId );
         }
+        Sleep ( 1000 );
+        processIdList = GetGTAProcessList ();
     }
 }
 
@@ -582,18 +589,11 @@ std::vector < DWORD > GetOtherMTAProcessList ( void )
 {
     std::vector < DWORD > result;
 
-    std::vector < DWORD > processIdList = MyEnumProcesses ();
-    for ( uint i = 0; i < processIdList.size (); i++ )
+    for ( auto processId : MyEnumProcesses() )
     {
-        DWORD processId = processIdList[i];
-        // Skip 64 bit processes to avoid errors
-        if ( !Is32bitProcess ( processId ) )
-            continue;
-
-        std::vector < SString > filenameList = GetPossibleProcessPathFilenames ( processId );
-        for ( uint i = 0; i < filenameList.size (); i++ )
-            if ( filenameList[i].EndsWith ( MTA_EXE_NAME ) )
-                ListAddUnique ( result, processId );
+        SString strPathFilename = GetProcessPathFilename ( processId );
+        if ( strPathFilename.EndsWith ( MTA_EXE_NAME ) )
+            ListAddUnique ( result, processId );
     }
 
     if ( DWORD processId = FindProcessId ( MTA_EXE_NAME ) )
@@ -635,14 +635,9 @@ void TerminateOtherMTAIfRunning ( void )
         // Try to stop all other MTA process id's
         for ( uint i = 0 ; i < 3 && processIdList.size () ; i++ )
         {
-            for ( std::vector < DWORD > ::iterator iter = processIdList.begin () ; iter != processIdList.end (); ++iter )
+            for ( auto processId : processIdList )
             {
-                HANDLE hProcess = OpenProcess ( PROCESS_TERMINATE, 0, *iter );
-                if ( hProcess )
-                {
-                    TerminateProcess ( hProcess, 0 );
-                    CloseHandle ( hProcess );
-                }
+                TerminateProcess( processId );
             }
             Sleep ( 1000 );
             processIdList = GetOtherMTAProcessList ();
@@ -735,17 +730,13 @@ SString GetMTASAPath ( void )
 ///////////////////////////////////////////////////////////////
 bool LookForGtaProcess ( SString& strOutPathFilename )
 {
-    std::vector < DWORD > processIdList = GetGTAProcessList ();
-    for ( uint i = 0 ; i < processIdList.size () ; i++ )
+    for ( auto processId : GetGTAProcessList() )
     {
-        std::vector < SString > filenameList = GetPossibleProcessPathFilenames ( processIdList[i] );
-        for ( uint i = 0 ; i < filenameList.size () ; i++ )
+        SString strPathFilename = GetProcessPathFilename ( processId );
+        if ( FileExists ( strPathFilename ) )
         {
-            if ( FileExists ( filenameList[i] ) )
-            {
-                strOutPathFilename = filenameList[i];
-                return true;
-            }
+            strOutPathFilename = strPathFilename;
+            return true;
         }
     }
     return false;
@@ -1402,6 +1393,24 @@ bool Is32bitProcess ( DWORD processID )
 
 ///////////////////////////////////////////////////////////////////////////
 //
+// TerminateProcess
+//
+// Terminate process from pid
+//
+///////////////////////////////////////////////////////////////////////////
+void TerminateProcess( DWORD dwProcessID, uint uiExitCode )
+{
+    HANDLE hProcess = OpenProcess( PROCESS_TERMINATE, 0, dwProcessID );
+    if ( hProcess )
+    {
+        TerminateProcess( hProcess, uiExitCode );
+        CloseHandle( hProcess );
+    }
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+//
 // CreateSingleInstanceMutex
 //
 //
@@ -1977,18 +1986,14 @@ void ForbodenProgramsMessage ( void )
     forbodenList.push_back( "CheatEngine" );
 
     SString strResult;
-    std::vector < DWORD > processIdList = MyEnumProcesses ();
-    for ( uint i = 0; i < processIdList.size (); i++ )
+    for ( auto processId : MyEnumProcesses( true ) )
     {
-        std::vector < SString > pathFilenameList = GetPossibleProcessPathFilenames ( processIdList[i] );
-        for ( uint p = 0; p < pathFilenameList.size (); p++ )
+        SString strPathFilename = GetProcessPathFilename ( processId );
+        SString strFilename = ExtractFilename( strPathFilename );
+        for ( auto forbodenName : forbodenList )
         {
-            SString strFilename = ExtractFilename( pathFilenameList[p] );
-            for ( uint f = 0; f < forbodenList.size (); f++ )
-            {
-                if ( strFilename.Replace( " ", "" ).BeginsWithI( forbodenList[f] ) )
-                    strResult += strFilename + "\n";
-            }
+            if ( strFilename.Replace( " ", "" ).BeginsWithI( forbodenName ) )
+                strResult += strFilename + "\n";
         }
     }
 
@@ -2026,6 +2031,12 @@ bool VerifyEmbeddedSignature( const SString& strFilename )
     WinTrustData.dwUnionChoice = WTD_CHOICE_FILE;
     WinTrustData.pFile = &FileData;
 
+    if ( !IsWindows7OrGreater() )
+    {
+        // Basic check for Vista and down due to incompatibility with current signing methodology
+        WinTrustData.dwProvFlags = WTD_HASH_ONLY_FLAG;
+    }
+
     GUID WVTPolicyGUID = WINTRUST_ACTION_GENERIC_VERIFY_V2;
     LONG lStatus = WinVerifyTrust( NULL, &WVTPolicyGUID, &WinTrustData );
     return lStatus == ERROR_SUCCESS;
@@ -2041,41 +2052,68 @@ bool VerifyEmbeddedSignature( const SString& strFilename )
 //////////////////////////////////////////////////////////
 void LogSettings( void )
 {
-    const char* szSettings[] = {
-                                "general", "aero-enabled",
-                                "general", "aero-changeable",
-                                "general", "driver-overrides-disabled",
-                                "general", "device-selection-disabled",
-                                "general", "customized-sa-files-using",
-                                "general", "times-connected",
-                                "general", "times-connected-editor",
-                                "nvhacks", "optimus-force-detection",
-                                "nvhacks", "optimus-export-enablement",
-                                "nvhacks", "optimus",
-                                "nvhacks", "optimus-rename-exe",
-                                "nvhacks", "optimus-alt-startup",
-                                "nvhacks", "optimus-force-windowed",
-                                "nvhacks", "optimus-dialog-skip",
-                                "nvhacks", "optimus-startup-option",
-                                "diagnostics", "send-dumps",
-                                "diagnostics", "last-minidump-time",
-                                "diagnostics", "user-confirmed-bsod-time",
-                                DIAG_MINIDUMP_DETECTED_COUNT,
-                                DIAG_MINIDUMP_CONFIRMED_COUNT,
-                                DIAG_PRELOAD_UPGRADES_LOWEST_UNSAFE,
-                                "general", "noav-user-says-skip",
-                                "general", "noav-last-asked-time",
-                            };
+    struct {
+        int bSkipIfZero;
+        const char* szPath;
+        const char* szName;
+        const char* szDesc;
+    } const settings[] = {
+                            { false, "general", GENERAL_PROGRESS_ANIMATION_DISABLE, "", },
+                            { false, "general", "aero-enabled", "", },
+                            { false, "general", "aero-changeable", "", },
+                            { false, "general", "driver-overrides-disabled", "", },
+                            { false, "general", "device-selection-disabled", "", },
+                            { false, "general", "customized-sa-files-using", "", },
+                            { false, "general", "times-connected", "", },
+                            { false, "general", "times-connected-editor", "", },
+                            { false, "nvhacks", "nvidia", "", },
+                            { false, "nvhacks", "optimus-force-detection", "", },
+                            { false, "nvhacks", "optimus-export-enablement", "", },
+                            { false, "nvhacks", "optimus", "", },
+                            { false, "nvhacks", "optimus-rename-exe", "", },
+                            { false, "nvhacks", "optimus-alt-startup", "", },
+                            { false, "nvhacks", "optimus-force-windowed", "", },
+                            { false, "nvhacks", "optimus-dialog-skip", "", },
+                            { false, "nvhacks", "optimus-startup-option", "", },
+                            { true,  "watchdog", "CR1", "COUNTER_CRASH_CHAIN_BEFORE_ONLINE_GAME", },
+                            { true,  "watchdog", "CR2", "COUNTER_CRASH_CHAIN_BEFORE_LOADING_SCREEN", },
+                            { true,  "watchdog", "CR3", "COUNTER_CRASH_CHAIN_BEFORE_USED_MAIN_MENU", },
+                            { true,  "watchdog", "L0", "SECTION_NOT_CLEAN_GTA_EXIT", },
+                            { true,  "watchdog", "L1", "SECTION_NOT_STARTED_ONLINE_GAME", },
+                            { true,  "watchdog", "L2", "SECTION_NOT_SHOWN_LOADING_SCREEN", },
+                            { true,  "watchdog", "L3", "SECTION_STARTUP_FREEZE", },
+                            { true,  "watchdog", "L4", "SECTION_NOT_USED_MAIN_MENU", },
+                            { true,  "watchdog", "L5", "SECTION_POST_INSTALL", },
+                            { true,  "watchdog", "lastruncrash", "", },
+                            { true,  "watchdog", "preload-upgrades", "", },
+                            { true,  "watchdog", "Q0", "SECTION_IS_QUITTING", },
+                            { true,  "watchdog", "uncleanstop", "", },
+                            { false, "diagnostics", "send-dumps", "", },
+                            { true,  "diagnostics", "last-minidump-time", "", },
+                            { true,  "diagnostics", "user-confirmed-bsod-time", "", },
+                            { true,  DIAG_MINIDUMP_DETECTED_COUNT, "", },
+                            { true,  DIAG_MINIDUMP_CONFIRMED_COUNT, "", },
+                            { true,  DIAG_PRELOAD_UPGRADES_LOWEST_UNSAFE, "", },
+                            { false, "general", "noav-user-says-skip", "", },
+                            { false, "general", "noav-last-asked-time", "", },
+                        };
 
-    for ( uint i = 0 ; i < NUMELMS( szSettings ) ; i += 2 )
+    for ( uint i = 0 ; i < NUMELMS( settings ) ; i++ )
     {
-        WriteDebugEvent( SString( "%s: %s", szSettings[i+1], *GetApplicationSetting( szSettings[i], szSettings[i+1] ) ) );
+        SString strValue = GetApplicationSetting( settings[i].szPath, settings[i].szName );
+        if ( !settings[i].bSkipIfZero || atoi( strValue ) != 0 )
+        {
+            WriteDebugEvent( SString( "%s.%s: %s %s", settings[i].szPath, settings[i].szName, *strValue, settings[i].szDesc ) );
+        }
     }
 
     uint uiTimeLastAsked = GetApplicationSettingInt( "noav-last-asked-time" );
-    uint uiTimeNow = static_cast < uint >( time( NULL ) / 3600LL );
-    uint uiHoursSinceLastAsked = uiTimeNow - uiTimeLastAsked;
-    WriteDebugEvent( SString( "noav-last-asked-time-hours-delta: %d", uiHoursSinceLastAsked ) );
+    if ( uiTimeLastAsked )
+    {
+        uint uiTimeNow = static_cast < uint >( time( NULL ) / 3600LL );
+        uint uiHoursSinceLastAsked = uiTimeNow - uiTimeLastAsked;
+        WriteDebugEvent( SString( "noav-last-asked-time-hours-delta: %d", uiHoursSinceLastAsked ) );
+    }
 }
 
 

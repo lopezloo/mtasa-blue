@@ -25,6 +25,27 @@
 
 class CLuaManager;
 
+struct SLogLine
+{
+    SString strText;
+    unsigned int uiMinimumDebugLevel;
+    unsigned char ucRed;
+    unsigned char ucGreen;
+    unsigned char ucBlue;
+    operator SString& ( void )
+    {
+        return strText;
+    }
+    bool operator ==( const SLogLine& other ) const
+    {
+        return strText == other.strText
+            && uiMinimumDebugLevel == other.uiMinimumDebugLevel
+            && ucRed == other.ucRed
+            && ucGreen == other.ucGreen
+            && ucBlue == other.ucBlue;
+    }
+};
+
 class CScriptDebugging
 {
 public:
@@ -52,6 +73,7 @@ public:
     void                            PopLuaMain                      ( CLuaMain* pLuaMain );
     void                            OnLuaMainDestroy                ( CLuaMain* pLuaMain );
     CLuaMain*                       GetTopLuaMain                   ( void );
+    void                            UpdateLogOutput                 ( void );
 
 private:
     SString                         ComposeErrorMessage             ( const char* szPrePend, const SLuaDebugInfo& luaDebugInfo, const char* szMessage );
@@ -68,6 +90,7 @@ private:
     SLuaDebugInfo                   m_SavedLuaDebugInfo;
     std::list < CLuaMain* >         m_LuaMainStack;
     HANDLE                          m_flushTimerHandle;
+    CDuplicateLineFilter < SLogLine > m_DuplicateLineFilter;
 };
 
 #endif

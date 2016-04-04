@@ -60,13 +60,19 @@ public:
     bool                        RemoveAjaxHandler   ( const SString& strURL );
 
     bool                        ToggleDevTools      ( bool visible );
-    
+
+    bool                        CanGoBack           ();
+    bool                        CanGoForward        ();
+    bool                        GoBack              ();
+    bool                        GoForward           ();
+    void                        Refresh             ( bool bIgnoreCache );
+
     // CWebBrowserEventsInterface implementation
     void                        Events_OnCreated       () override;
     void                        Events_OnLoadingStart  ( const SString& strURL, bool bMainFrame ) override;
     void                        Events_OnDocumentReady ( const SString& strURL ) override;
     void                        Events_OnLoadingFailed ( const SString& strURL, int errorCode, const SString& errorDescription ) override;
-    void                        Events_OnNavigate      ( const SString& strURL, bool bIsBlocked ) override;
+    void                        Events_OnNavigate      ( const SString& strURL, bool bIsBlocked, bool isMainFrame ) override;
     void                        Events_OnPopup         ( const SString& strTargetURL, const SString& strOpenerURL ) override;
     void                        Events_OnChangeCursor  ( unsigned char ucCursor ) override;
     void                        Events_OnTriggerEvent  ( const SString& strEventName, const std::vector<std::string>& arguments ) override;

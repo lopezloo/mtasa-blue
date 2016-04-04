@@ -297,34 +297,20 @@ bool CLuaMain::LoadScriptFromBuffer ( const char* cpInBuffer, unsigned int uiInS
 {
     SString strNiceFilename = ConformResourcePath( szFileName );
 
-    // Decrypt if required
+    // Deobfuscate if required
     const char* cpBuffer;
     uint uiSize;
-    if ( !g_pRealNetServer->DecryptScript( cpInBuffer, uiInSize, &cpBuffer, &uiSize, strNiceFilename ) )
+    if ( !g_pRealNetServer->DeobfuscateScript( cpInBuffer, uiInSize, &cpBuffer, &uiSize, strNiceFilename ) )
     {
         SString strMessage( "%s is invalid. Please re-compile at http://luac.mtasa.com/", *strNiceFilename ); 
         g_pGame->GetScriptDebugging()->LogError ( m_luaVM, "Loading script failed: %s", *strMessage );
         return false;
     }
 
-    bool bUTF8;
-
-    // UTF-8 BOM?  Compare by checking the standard UTF-8 BOM
-    if ( IsUTF8BOM( cpBuffer, uiSize ) == false )
-    {
-        // Maybe not UTF-8, if we have a >80% heuristic detection confidence, assume it is
-        bUTF8 = ( GetUTF8Confidence ( (const unsigned char*)cpBuffer, uiSize ) >= 80 );
-    }
-    else
-    {
-        // If there's a BOM, load ignoring the first 3 bytes
-        bUTF8 = true;
-        cpBuffer += 3;
-        uiSize -= 3;
-    }
+    bool bUTF8 = CLuaShared::CheckUTF8BOMAndUpdate ( &cpBuffer, &uiSize );
 
     // If compiled script, make sure correct chunkname is embedded
-    EmbedChunkName( strNiceFilename, &cpBuffer, &uiSize );
+    CLuaShared::EmbedChunkName( strNiceFilename, &cpBuffer, &uiSize );
 
     if ( m_luaVM )
     {

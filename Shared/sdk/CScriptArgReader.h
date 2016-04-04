@@ -9,7 +9,12 @@
 *  Multi Theft Auto is available from http://www.multitheftauto.com/
 *
 *****************************************************************************/
+#pragma once
+#include <limits>
 
+#ifdef MTA_CLIENT
+    #include "CScriptDebugging.h"
+#endif
 
 /////////////////////////////////////////////////////////////////////////
 //
@@ -42,21 +47,25 @@ public:
     //
     // Read next number
     //
-    template < class T >
-    void ReadNumber ( T& outValue )
+    template < typename T >
+    void ReadNumber ( T& outValue, bool checkSign = true )
     {
-        int iArgument = lua_type ( m_luaVM, m_iIndex );
-        if ( iArgument == LUA_TNUMBER || iArgument == LUA_TSTRING )
+        if ( lua_isnumber( m_luaVM, m_iIndex ) == 1 )
         {
-            lua_Number number = lua_tonumber(m_luaVM, m_iIndex++);
+            lua_Number number = lua_tonumber ( m_luaVM, m_iIndex++ );
 
-            if (std::isnan(number))
+            if ( std::isnan( number ) )
             {
-                SetCustomError("Expected number, got NaN", "Bad argument");
+                SetCustomError ( "Expected number, got NaN", "Bad argument" );
                 return;
             }
 
-            outValue = static_cast < T > (number);
+            if ( checkSign && std::is_unsigned < T > () && number < -FLT_EPSILON )
+            {
+                SetCustomWarning ( "Expected positive value, got negative. This warning may be an error in future versions." );
+            }
+
+            outValue = static_cast < T > ( number );
             return;
         }
 
@@ -68,18 +77,23 @@ public:
     //
     // Read next number, using default if needed
     //
-    template < class T, class U >
-    void ReadNumber ( T& outValue, const U& defaultValue )
+    template < typename T, typename U >
+    void ReadNumber ( T& outValue, const U& defaultValue, bool checkSign = true )
     {
         int iArgument = lua_type ( m_luaVM, m_iIndex );
         if ( iArgument == LUA_TNUMBER || iArgument == LUA_TSTRING )
         {
-            lua_Number number = lua_tonumber(m_luaVM, m_iIndex++);
+            lua_Number number = lua_tonumber ( m_luaVM, m_iIndex++ );
 
-            if (std::isnan(number))
+            if ( std::isnan ( number ) )
             {
-                SetCustomError("Expected number, got NaN", "Bad argument");
+                SetCustomError ( "Expected number, got NaN", "Bad argument" );
                 return;
+            }
+
+            if ( checkSign && std::is_unsigned < T > () && number < -FLT_EPSILON )
+            {
+                SetCustomWarning ( "Expected positive value, got negative. This warning may be an error in future versions." );
             }
 
             outValue = static_cast < T > ( number );
@@ -442,6 +456,30 @@ public:
         outValue = CMatrix();
         SetTypeError ( "matrix" );
         m_iIndex++;
+    }
+
+    //
+    // Read next color
+    //
+    void ReadColor ( SColor& outValue )
+    {
+        lua_Number color;
+        ReadNumber ( color );
+
+        if ( !m_bError )
+            outValue = static_cast<unsigned int> ( color );
+    }
+
+    //
+    // Read next color
+    //
+    void ReadColor ( SColor& outValue, const SColor& defaultValue )
+    {
+        lua_Number color;
+        ReadNumber ( color, static_cast<lua_Number> ( defaultValue ) );
+
+        if ( !m_bError )
+            outValue = static_cast<unsigned int> ( color );
     }
 
     //
@@ -1109,11 +1147,24 @@ public:
     //
     // HasErrors - Optional check if there are any unread arguments
     //
-    bool HasErrors ( bool bCheckUnusedArgs = false ) const
+    bool HasErrors ( bool bCheckUnusedArgs = false )
     {
         assert ( !IsReadFunctionPending () );
         if ( bCheckUnusedArgs && lua_type ( m_luaVM, m_iIndex ) != LUA_TNONE )
             return true;
+
+        // Output warning here (there's no better way to integrate it without huge code changes
+        if ( !m_bError && !m_strCustomWarning.empty () )
+        {
+            #ifdef MTA_CLIENT
+                CLuaFunctionDefs::m_pScriptDebugging->LogWarning ( m_luaVM, m_strCustomWarning );
+            #else
+                g_pGame->GetScriptDebugging ()->LogWarning ( m_luaVM, m_strCustomWarning );
+            #endif
+            
+            m_strCustomWarning.clear ();
+        }
+
         return m_bError;
     }
 
@@ -1175,11 +1226,11 @@ public:
     }
 
     //
-    // Set version error message
+    // Set version warning message
     //
-    void SetVersionError ( const char* szMinReq, const char* szSide, const char* szReason )
+    void SetVersionWarning ( const char* szMinReq, const char* szSide, const char* szReason )
     {
-        SetCustomError ( SString ( "<min_mta_version> section in the meta.xml is incorrect or missing (expected at least %s %s because %s)", szSide, szMinReq, szReason ) );
+        SetCustomWarning ( SString ( "<min_mta_version> section in the meta.xml is incorrect or missing (expected at least %s %s because %s)", szSide, szMinReq, szReason ) );
     }
 
     //
@@ -1205,6 +1256,14 @@ public:
     }
 
     //
+    // Set custom warning message
+    //
+    void SetCustomWarning ( const SString& message )
+    {
+        m_strCustomWarning = message;
+    }
+
+    //
     // Skip n arguments
     //
     void Skip ( int n )
@@ -1225,5 +1284,6 @@ public:
     SString                 m_strErrorCategory;
     bool                    m_bHasCustomMessage;
     SString                 m_strCustomMessage;
+    SString                 m_strCustomWarning;
 
 };

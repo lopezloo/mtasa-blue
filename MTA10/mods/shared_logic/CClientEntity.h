@@ -83,6 +83,7 @@ enum eClientEntityType
     CCLIENTRENDERTARGET,
     CCLIENTBROWSER,
     CCLIENTROPE,
+    CCLIENTSEARCHLIGHT,
     CCLIENTUNKNOWN,
 };
 
@@ -148,6 +149,7 @@ enum eCClientEntityClassTypes
     CLASS_CClientEffect,
     CLASS_CClientPointLights,
     CLASS_CClientRope,
+    CLASS_CClientSearchLight
 };
 
 

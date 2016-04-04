@@ -88,6 +88,7 @@
 #include <CClientTexture.h>
 #include <CClientShader.h>
 #include <CClientWebBrowser.h>
+#include <CClientSearchLight.h>
 #include <CClientEffect.h>
 #include <CCustomData.h>
 #include <CElementArray.h>
@@ -104,11 +105,22 @@
 #include <lua/CLuaFunctionParseHelpers.h>
 #include <CScriptArgReader.h>
 #include <luadefs/CLuaDefs.h>
+#include <luadefs/CLuaAudioDefs.h>
+#include <luadefs/CLuaBitDefs.h>
+#include <luadefs/CLuaBlipDefs.h>
+#include <luadefs/CLuaBrowserDefs.h>
 #include <luadefs/CLuaClassDefs.h>
+#include <luadefs/CLuaMarkerDefs.h>
+#include <luadefs/CLuaObjectDefs.h>
+#include <luadefs/CLuaPointLightDefs.h>
+#include <luadefs/CLuaPedDefs.h>
+#include <luadefs/CLuaPlayerDefs.h>
 #include <luadefs/CLuaVector2Defs.h>
 #include <luadefs/CLuaVector3Defs.h>
 #include <luadefs/CLuaVector4Defs.h>
+#include <luadefs/CLuaVehicleDefs.h>
 #include <luadefs/CLuaMatrixDefs.h>
+#include <luadefs/CLuaSearchLightDefs.h>
 #include <luadefs/CLuaTaskDefs.h>
 #include <luadefs/CLuaFxDefs.h>
 #include <luadefs/CLuaFileDefs.h>
@@ -134,6 +146,7 @@
 #include "logic/CDeathmatchVehicle.h"
 #include "logic/CResource.h"
 #include "logic/CStaticFunctionDefinitions.h"
+#include "logic/CResourceFileDownloadManager.h"
 #include "../../version.h"
 
 

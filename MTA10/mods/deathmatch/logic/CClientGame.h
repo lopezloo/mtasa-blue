@@ -63,6 +63,7 @@
 class CGameEntityXRefManager;
 class CClientModelCacheManager;
 class CDebugHookManager;
+class CResourceFileDownloadManager;
 
 struct SVehExtrapolateSettings
 {
@@ -305,6 +306,7 @@ public:
     inline CElementDeleter*             GetElementDeleter               ( void )        { return &m_ElementDeleter; }
     inline CObjectRespawner*            GetObjectRespawner              ( void )        { return &m_ObjectRespawner; }
     CRemoteCalls*                       GetRemoteCalls                  ( void )        { return m_pRemoteCalls; }
+    CResourceFileDownloadManager*       GetResourceFileDownloadManager  ( void )        { return m_pResourceFileDownloadManager; }
 
     // Status toggles
     void                                ShowNetstat                     ( int iCmd );
@@ -433,8 +435,7 @@ public:
     void                                ProjectileInitiateHandler       ( CClientProjectile * pProjectile );
     void                                IdleHandler                     ( void );
     void                                OutputServerInfo                ( void );
-    bool                                IsUsingExternalHTTPServer       ( void )                        { return m_ucHTTPDownloadType == HTTP_DOWNLOAD_ENABLED_URL; }
-    void                                TellServerSomethingImportant    ( uint uiId, const SString& strMessage, bool bOnlyOnceForThisId );
+    void                                TellServerSomethingImportant    ( uint uiId, const SString& strMessage, uint uiSendLimitForThisId = 0 );
     void                                ChangeFloatPrecision            ( bool bHigh );
     bool                                IsHighFloatPrecision            ( void ) const;
 
@@ -485,7 +486,6 @@ private:
     void                                DrawWeaponsyncData              ( CClientPlayer* pPlayer );
     #endif
 
-    void                                DownloadInitialResourceFiles    ( void );
     void                                DownloadSingularResourceFiles   ( void );
 
     void                                QuitPlayer                      ( CClientPlayer* pPlayer, eQuitReason Reason );
@@ -500,6 +500,7 @@ private:
     static void                         StaticDrawRadarAreasHandler     ( void );
     static void                         StaticRender3DStuffHandler      ( void );
     static void                         StaticPreRenderSkyHandler       ( void );
+    static void                         StaticRenderHeliLightHandler    ( void );
     static bool                         StaticChokingHandler            ( unsigned char ucWeaponType );
     static void                         StaticPreWorldProcessHandler    ( void );
     static void                         StaticPostWorldProcessHandler   ( void );
@@ -577,11 +578,8 @@ public:
     void                                SetServerVersionSortable        ( const SString& strVersion )   { m_strServerVersionSortable = strVersion; }
     const SString&                      GetServerVersionSortable        ( void )                        { return m_strServerVersionSortable; }
 
-    void                                SetTransferringInitialFiles     ( bool bTransfer, int iDownloadPriorityGroup = INVALID_DOWNLOAD_PRIORITY_GROUP );
-    bool                                IsTransferringInitialFiles      ( void )            { return m_bTransferringInitialFiles; }
     void                                SetTransferringSingularFiles    ( bool bTransfer )  { m_bTransferringSingularFiles = bTransfer; }
     bool                                IsTransferringSingularFiles     ( void )            { return m_bTransferringSingularFiles; }
-    int                                 GetActiveDownloadPriorityGroup  ( void );
 
     void                                SetVehExtrapolateSettings       ( const SVehExtrapolateSettings& settings ) { m_VehExtrapolateSettings = settings; }
     const SVehExtrapolateSettings&      GetVehExtrapolateSettings       ( void )                                    { return m_VehExtrapolateSettings; }
@@ -650,6 +648,7 @@ private:
     CClientModelCacheManager*           m_pModelCacheManager;
     CDebugHookManager*                  m_pDebugHookManager;
     CRemoteCalls*                       m_pRemoteCalls;
+    CResourceFileDownloadManager*       m_pResourceFileDownloadManager;
 
     // Revised facilities
     CServer                             m_Server;
@@ -711,9 +710,7 @@ private:
     bool                                m_bShowNetstat;
     bool                                m_bShowFPS;
 
-    bool                                m_bTransferringInitialFiles;
     bool                                m_bTransferringSingularFiles;
-    int                                 m_iActiveDownloadPriorityGroup;
 
     float                               m_fGameSpeed;
     long                                m_lMoney;
@@ -730,8 +727,6 @@ private:
 
     CClientGUIElement*                  m_pClickedGUIElement;
 
-    eHTTPDownloadType                   m_ucHTTPDownloadType;
-    unsigned short                      m_usHTTPDownloadPort;
     SString                             m_strHTTPDownloadURL;
 
     bool                                m_bReceivingBigPacket;
@@ -798,7 +793,7 @@ private:
     SMiscGameSettings                   m_MiscGameSettings;
     uint                                m_uiAltPulseOrderCounter;
     SString                             m_strACInfo;
-    std::set < uint >                   m_SentMessageIds;
+    std::map < uint, uint >             m_SentMessageIds;
 
     bool                                m_bLastKeyWasEscapeCancelled;
     std::set < SString >                m_AllowKeyUpMap;
