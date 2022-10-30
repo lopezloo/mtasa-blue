@@ -15,6 +15,7 @@
 #include <game/CPedDamageResponse.h>
 #include <game/CEventList.h>
 #include <game/CEventDamage.h>
+#include <game/TaskTypes.h>
 
 class CEventDamageSAInterface;
 
@@ -1550,6 +1551,11 @@ void CMultiplayerSA::InitHooks()
     // Array size: 0x40 (16 elements)
     // Array element size: 0x04
     MemPut<BYTE>(0x7069FE, 0x08);
+
+    // Fix ped real time shadows disappears when ped is entering vehicle
+    // Use TASK_SIMPLE_CAR_GET_IN instead of TASK_COMPLEX_ENTER_CAR_AS_DRIVER in CPed::PreRenderAfterTest()
+    // for a check if ped is entering vehicle and thus not rendering dynamic ped shadow in that moment
+    MemPut<int>(0x5E6744 + 1, TASK_SIMPLE_CAR_GET_IN);
 
     // Fix ped real time shadows do not render on some objects
     // by skipping some entity flag check in CShadows::CastRealTimeShadowSectorList()
