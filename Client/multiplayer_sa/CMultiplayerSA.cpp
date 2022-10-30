@@ -1552,7 +1552,7 @@ void CMultiplayerSA::InitHooks()
     // Array element size: 0x04
     MemPut<BYTE>(0x7069FE, 0x08);
 
-    // Fix ped real time shadows disappears when ped is entering vehicle
+    // Fix ped real time shadows disappears when ped is entering vehicle as driver
     // Use TASK_SIMPLE_CAR_GET_IN instead of TASK_COMPLEX_ENTER_CAR_AS_DRIVER in CPed::PreRenderAfterTest()
     // for a check if ped is entering vehicle and thus not rendering dynamic ped shadow in that moment
     MemPut<int>(0x5E6744 + 1, TASK_SIMPLE_CAR_GET_IN);
@@ -1561,7 +1561,7 @@ void CMultiplayerSA::InitHooks()
     // by skipping some entity flag check in CShadows::CastRealTimeShadowSectorList()
     MemSet((void*)0x70A83B, 0x90, 6);
 
-    // Fix vehicle blob shadows and light textures do not render on some objects when vehicle is empty
+    // Fix vehicle blob shadows and light textures do not render on some objects when vehicle is unoccupied
     // by skipping some entity flag check in CShadows::CastPlayerShadowSectorList()
     MemSet((void*)0x70A4CB, 0x90, 6);
 
